@@ -14,6 +14,11 @@ from types import SimpleNamespace
 from typing import Any
 from openai import AzureOpenAI, OpenAI
 
+# Sentinel value used as the api_version when the "openai_compatible"
+# auth_mode is selected. Real Azure deployments never use this string,
+# so it doubles as a marker for downstream type narrowing.
+_OPENAI_COMPATIBLE_API_VERSION = "openai-compat"
+
 # ── Configuration ─────────────────────────────────────────────────────────────
 
 ENDPOINT = os.environ.get(
@@ -177,8 +182,8 @@ tracker = TokenTracker()
 
 # ── Client management ─────────────────────────────────────────────────────────
 
-_optimizer_client: AzureOpenAI | None = None
-_target_client: AzureOpenAI | None = None
+_optimizer_client: AzureOpenAI | OpenAI | None = None
+_target_client: AzureOpenAI | OpenAI | None = None
 _optimizer_lock = threading.Lock()
 _target_lock = threading.Lock()
 
@@ -278,7 +283,7 @@ def _make_azure_cli_token_provider(ad_scope: str):
     return _provider
 
 
-def _make_client(role: str) -> AzureOpenAI:
+def _make_client(role: str) -> AzureOpenAI | OpenAI:
     cfg = _role_config(role)
     if not cfg["endpoint"]:
         raise ValueError(
@@ -287,6 +292,12 @@ def _make_client(role: str) -> AzureOpenAI:
             "or set AZURE_OPENAI_ENDPOINT in your environment."
         )
     auth_mode = cfg["auth_mode"]
+    if auth_mode in {"openai_compatible", "compat", "openai"}:
+        return OpenAI(
+            base_url=cfg["endpoint"].rstrip("/"),
+            api_key=cfg["api_key"] or "dummy",
+            default_headers={"User-Agent": "SkillOpt"},
+        )
     if auth_mode in {"api_key", "key"}:
         if not cfg["api_key"]:
             raise ValueError(
@@ -309,7 +320,7 @@ def _make_client(role: str) -> AzureOpenAI:
     )
 
 
-def get_optimizer_client() -> AzureOpenAI:
+def get_optimizer_client() -> AzureOpenAI | OpenAI:
     global _optimizer_client
     with _optimizer_lock:
         if _optimizer_client is None:
@@ -342,7 +353,7 @@ def _needs_responses_api(deployment: str) -> bool:
 # ── Core chat function ────────────────────────────────────────────────────────
 
 def _chat_impl(
-    client: AzureOpenAI,
+    client: AzureOpenAI | OpenAI,
     deployment: str,
     system: str,
     user: str,
@@ -425,7 +436,7 @@ def _chat_impl(
 
 
 def _chat_messages_impl(
-    client: AzureOpenAI,
+    client: AzureOpenAI | OpenAI,
     deployment: str,
     messages: list[dict[str, Any]],
     max_completion_tokens: int,
@@ -636,6 +647,11 @@ def configure_azure_openai(
     shared_ad_scope = _clean(ad_scope)
     shared_managed_identity_client_id = _clean(managed_identity_client_id)
 
+    # Auto-configure for openai_compatible mode
+    if shared_auth_mode in {"openai_compatible", "compat", "openai"}:
+        if shared_api_version is None:
+            shared_api_version = _OPENAI_COMPATIBLE_API_VERSION
+
     _set("ENDPOINT", shared_endpoint, "AZURE_OPENAI_ENDPOINT")
     _set("API_VERSION", shared_api_version, "AZURE_OPENAI_API_VERSION")
     _set("API_KEY", shared_api_key, "AZURE_OPENAI_API_KEY")
@@ -656,6 +672,12 @@ def configure_azure_openai(
         _clean(optimizer_managed_identity_client_id)
         or shared_managed_identity_client_id
     )
+    
+    # Auto-configure for openai_compatible mode
+    if resolved_optimizer_auth_mode in {"openai_compatible", "compat", "openai"}:
+        if resolved_optimizer_api_version is None:
+            resolved_optimizer_api_version = _OPENAI_COMPATIBLE_API_VERSION
+    
     resolved_target_endpoint = _clean(target_endpoint) or shared_endpoint
     resolved_target_api_version = _clean(target_api_version) or shared_api_version
     resolved_target_api_key = _clean(target_api_key) or shared_api_key
@@ -665,6 +687,11 @@ def configure_azure_openai(
         _clean(target_managed_identity_client_id)
         or shared_managed_identity_client_id
     )
+    
+    # Auto-configure for openai_compatible mode
+    if resolved_target_auth_mode in {"openai_compatible", "compat", "openai"}:
+        if resolved_target_api_version is None:
+            resolved_target_api_version = _OPENAI_COMPATIBLE_API_VERSION
 
     _set("OPTIMIZER_ENDPOINT", resolved_optimizer_endpoint, "OPTIMIZER_AZURE_OPENAI_ENDPOINT")
     _set(
