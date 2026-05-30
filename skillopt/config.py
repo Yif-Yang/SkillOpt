@@ -101,6 +101,8 @@ _FLATTEN_MAP: dict[str, str] = {
     "optimizer.longitudinal_pair_policy": "longitudinal_pair_policy",
     "optimizer.use_meta_skill": "use_meta_skill",
     "evaluation.use_gate": "use_gate",
+    "evaluation.gate_metric": "gate_metric",
+    "evaluation.gate_mixed_weight": "gate_mixed_weight",
     "evaluation.sel_env_num": "sel_env_num",
     "evaluation.test_env_num": "test_env_num",
     "evaluation.eval_test": "eval_test",

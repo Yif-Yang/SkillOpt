@@ -24,7 +24,7 @@ from collections import defaultdict
 
 from skillopt.datasets.base import BatchSpec
 from skillopt.envs.base import EnvAdapter
-from skillopt.evaluation.gate import evaluate_gate
+from skillopt.evaluation.gate import evaluate_gate, select_gate_score
 from skillopt.gradient.aggregate import merge_patches
 from skillopt.optimizer.meta_skill import run_meta_skill
 from skillopt.optimizer.clip import rank_and_select
@@ -845,6 +845,26 @@ class ReflACTTrainer:
                 "Gate validation is mandatory in this branch. Remove "
                 "`evaluation.use_gate=false` from the config."
             )
+        gate_metric = str(cfg.get("gate_metric", "hard")).strip().lower()
+        if gate_metric not in {"hard", "soft", "mixed"}:
+            raise ValueError(
+                f"evaluation.gate_metric must be 'hard' | 'soft' | 'mixed', "
+                f"got {gate_metric!r}"
+            )
+        gate_mixed_weight = float(cfg.get("gate_mixed_weight", 0.5))
+        if not 0.0 <= gate_mixed_weight <= 1.0:
+            raise ValueError(
+                f"evaluation.gate_mixed_weight must be in [0, 1], "
+                f"got {gate_mixed_weight}"
+            )
+        print(
+            f"  [gate] metric={gate_metric}"
+            + (
+                f" mixed_weight={gate_mixed_weight}"
+                if gate_metric == "mixed"
+                else ""
+            )
+        )
         if current_score < 0:
             print(f"\n{'='*60}")
             print("  BASELINE — evaluate initial skill on Selection set (valid_seen)")
@@ -857,16 +877,20 @@ class ReflACTTrainer:
             print(f"  Selection items: {sel_n}")
             baseline_dir = os.path.join(out_root, "selection_eval_baseline")
             baseline_results = adapter.rollout(sel_env, skill_init, baseline_dir)
-            current_score, baseline_soft = compute_score(baseline_results)
+            baseline_hard, baseline_soft = compute_score(baseline_results)
+            current_score = select_gate_score(
+                baseline_hard, baseline_soft, gate_metric, gate_mixed_weight,
+            )
             best_score = current_score
             sh = skill_hash(skill_init)
-            sel_cache[sh] = (current_score, baseline_soft)
+            sel_cache[sh] = (baseline_hard, baseline_soft)
             current_origin = "initial_skill"
             best_origin = "initial_skill"
             _persist_runtime_state(0)
             print(
-                f"  [baseline result] selection hard={current_score:.4f} "
-                f"soft={baseline_soft:.4f}"
+                f"  [baseline result] selection hard={baseline_hard:.4f} "
+                f"soft={baseline_soft:.4f} "
+                f"gate[{gate_metric}]={current_score:.4f}"
             )
 
         # ── Training loop ────────────────────────────────────────────────
@@ -1287,7 +1311,15 @@ class ReflACTTrainer:
                     best_score=best_score,
                     best_step=best_step,
                     global_step=global_step,
+                    cand_soft=cand_soft,
+                    metric=gate_metric,
+                    mixed_weight=gate_mixed_weight,
                 )
+                cand_gate_score = select_gate_score(
+                    cand_hard, cand_soft, gate_metric, gate_mixed_weight,
+                )
+                step_rec["gate_metric"] = gate_metric
+                step_rec["candidate_gate_score"] = cand_gate_score
                 step_rec["action"] = gate.action
                 prev_current = current_score
                 prev_best = best_score
@@ -1301,20 +1333,29 @@ class ReflACTTrainer:
                 if gate.action == "accept_new_best":
                     best_origin = current_origin
 
+                if gate_metric == "hard":
+                    score_label = f"hard={cand_hard:.4f}"
+                elif gate_metric == "soft":
+                    score_label = f"soft={cand_soft:.4f}"
+                else:
+                    score_label = (
+                        f"mixed[w={gate_mixed_weight}]={cand_gate_score:.4f} "
+                        f"(hard={cand_hard:.4f} soft={cand_soft:.4f})"
+                    )
                 if gate.action == "accept_new_best":
                     print(
                         f"    [6/6 EVALUATE] ACCEPT (new best) "
-                        f"hard={cand_hard:.4f} > prev best {prev_best:.4f}"
+                        f"{score_label} > prev best {prev_best:.4f}"
                     )
                 elif gate.action == "accept":
                     print(
                         f"    [6/6 EVALUATE] ACCEPT "
-                        f"hard={cand_hard:.4f} > current={prev_current:.4f}"
+                        f"{score_label} > current={prev_current:.4f}"
                     )
                 else:
                     print(
                         f"    [6/6 EVALUATE] REJECT "
-                        f"hard={cand_hard:.4f} <= current={current_score:.4f}"
+                        f"{score_label} <= current={current_score:.4f}"
                     )
 
                 step_rec["timing"]["evaluate_s"] = round(time.time() - t_phase, 1)
@@ -1343,7 +1384,7 @@ class ReflACTTrainer:
                         if isinstance(item, dict)
                     ]
                     buf_entry["score_before"] = current_score
-                    buf_entry["score_after"] = cand_hard
+                    buf_entry["score_after"] = cand_gate_score
                     buf_entry["rejected_edits"] = rejected_edits
 
                 step_buffer.append(buf_entry)
