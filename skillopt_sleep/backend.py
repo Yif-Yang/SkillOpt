@@ -741,18 +741,93 @@ class DualBackend(Backend):
         return self.target.tokens_used() + self.optimizer.tokens_used()
 
 
+# ── Azure OpenAI backend (gpt-5.x via managed identity) ───────────────────────
+
+# Endpoint -> deployments, from the intern's avail_api.md. The backend picks the
+# first endpoint that hosts the requested deployment.
+_AZURE_ENDPOINTS = {
+    "https://oaidr9.openai.azure.com/": {"gpt-5.5", "gpt-5.4", "gpt-5.4-mini", "gpt-5.4-nano", "o3"},
+    "https://t2vgoaigpt4o6.openai.azure.com/": {"gpt-5.5", "gpt-4o-mini", "o3", "o4-mini"},
+    "https://oaidr21.openai.azure.com/": {"gpt-5.5", "o3", "o4-mini"},
+    "https://searchagent5.cognitiveservices.azure.com/": {"gpt-5.4-mini", "gpt-4o-mini"},
+    "https://t2vgoaigpt4o.openai.azure.com/": {"gpt-5.4", "gpt-5.4-nano", "gpt-5.2", "gpt-5.1", "o3", "o4-mini"},
+}
+_AZURE_MI_CLIENT_ID = "8cafa2b1-a2a7-4ad9-814a-ffe4aed7e800"
+
+
+class AzureOpenAIBackend(CliBackend):
+    """Drives Azure OpenAI gpt-5.x deployments via managed identity.
+
+    Mirrors the intern's blog_1 setup (avail_api.md): managed-identity auth, the
+    same endpoints/deployments. Reuses CliBackend's attempt/judge/reflect prompts
+    and JSON parsing; only _call() differs. openai + azure-identity are lazy
+    imported so the mock/CLI paths stay dependency-free.
+    """
+
+    name = "azure"
+
+    def __init__(self, deployment: str = "", endpoint: str = "", timeout: int = 180,
+                 api_version: str = "2024-12-01-preview") -> None:
+        super().__init__(model=deployment or "gpt-5.5", timeout=timeout)
+        self.deployment = deployment or "gpt-5.5"
+        self.endpoint = endpoint or self._endpoint_for(self.deployment)
+        self.api_version = api_version
+        self.name = f"azure:{self.deployment}"
+        self._client = None
+
+    @staticmethod
+    def _endpoint_for(deployment: str) -> str:
+        for ep, deps in _AZURE_ENDPOINTS.items():
+            if deployment in deps:
+                return ep
+        return "https://oaidr9.openai.azure.com/"
+
+    def _get_client(self):
+        if self._client is None:
+            from azure.identity import ManagedIdentityCredential, get_bearer_token_provider
+            from openai import AzureOpenAI
+            cred = ManagedIdentityCredential(client_id=_AZURE_MI_CLIENT_ID)
+            tp = get_bearer_token_provider(cred, "https://cognitiveservices.azure.com/.default")
+            self._client = AzureOpenAI(
+                azure_endpoint=self.endpoint, azure_ad_token_provider=tp,
+                api_version=self.api_version, max_retries=4,
+            )
+        return self._client
+
+    def _call(self, prompt: str, *, max_tokens: int = 1024) -> str:
+        try:
+            client = self._get_client()
+            resp = client.chat.completions.create(
+                model=self.deployment,
+                messages=[{"role": "user", "content": prompt}],
+                max_completion_tokens=16384,
+            )
+            text = (resp.choices[0].message.content or "").strip()
+            try:
+                u = resp.usage
+                self._tokens += (getattr(u, "prompt_tokens", 0) or 0) + (getattr(u, "completion_tokens", 0) or 0)
+            except Exception:
+                pass
+            return text
+        except Exception:
+            return ""
+
+
 def get_backend(
     name: str,
     *,
     model: str = "",
     claude_path: str = "claude",
     codex_path: str = "",
+    azure_endpoint: str = "",
 ) -> Backend:
     n = (name or "mock").strip().lower()
     if n in {"claude", "anthropic", "claude_cli", "claude_code"}:
         return ClaudeCliBackend(model=model, claude_path=claude_path)
     if n in {"codex", "codex_cli", "openai_codex"}:
         return CodexCliBackend(model=model, codex_path=codex_path)
+    if n in {"azure", "azure_openai", "aoai"}:
+        return AzureOpenAIBackend(deployment=model, endpoint=azure_endpoint)
     return MockBackend()
 
 
@@ -765,6 +840,7 @@ def build_backend(
     target_backend: str = "",
     target_model: str = "",
     codex_path: str = "",
+    azure_endpoint: str = "",
     preferences: str = "",
 ) -> Backend:
     """Build a single or dual backend.
@@ -776,11 +852,13 @@ def build_backend(
     """
     has_split = any([optimizer_backend, optimizer_model, target_backend, target_model])
     if not has_split:
-        be = get_backend(backend, model=model, codex_path=codex_path)
+        be = get_backend(backend, model=model, codex_path=codex_path, azure_endpoint=azure_endpoint)
         be.preferences = preferences
         return be
-    tgt = get_backend(target_backend or backend, model=target_model or model, codex_path=codex_path)
-    opt = get_backend(optimizer_backend or backend, model=optimizer_model or model, codex_path=codex_path)
+    tgt = get_backend(target_backend or backend, model=target_model or model,
+                      codex_path=codex_path, azure_endpoint=azure_endpoint)
+    opt = get_backend(optimizer_backend or backend, model=optimizer_model or model,
+                      codex_path=codex_path, azure_endpoint=azure_endpoint)
     opt.preferences = preferences  # reflect runs on the optimizer
     dual = DualBackend(target=tgt, optimizer=opt)
     dual.preferences = preferences
