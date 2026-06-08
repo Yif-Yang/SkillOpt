@@ -43,7 +43,7 @@ def _score(backend, tasks, skill, split="test"):
 
 
 def run_family(backend, family: str, *, nights: int, edit_budget: int,
-               rollouts_k: int, gate_mode: str, dream_factor: int,
+               rollouts_k: int, gate_mode: str, gate_metric: str, dream_factor: int,
                train_size: int, val_fraction: float, test_fraction: float,
                seed: int) -> dict:
     real = make_tasks(family)
@@ -66,7 +66,7 @@ def run_family(backend, family: str, *, nights: int, edit_budget: int,
     cur = skill
     for night in range(1, nights + 1):
         res = consolidate(backend, tasks, cur, "", edit_budget=edit_budget,
-                          gate_metric="mixed", gate_mode=gate_mode,
+                          gate_metric=gate_metric, gate_mode=gate_mode,
                           rollouts_k=rollouts_k, evolve_skill=True,
                           evolve_memory=False, night=night)
         if res.accepted:
@@ -89,18 +89,22 @@ def run_family(backend, family: str, *, nights: int, edit_budget: int,
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="SkillOpt-Sleep academic daily-case benchmark")
-    ap.add_argument("--backend", default="mock", choices=["mock", "claude", "codex"])
+    ap.add_argument("--backend", default="mock", choices=["mock", "claude", "codex", "azure"])
     ap.add_argument("--model", default="")
     ap.add_argument("--optimizer-backend", default="")
     ap.add_argument("--optimizer-model", default="")
     ap.add_argument("--target-backend", default="")
     ap.add_argument("--target-model", default="")
     ap.add_argument("--codex-path", default="")
+    ap.add_argument("--azure-endpoint", default="", help="override Azure endpoint (else auto by deployment)")
     ap.add_argument("--families", default="", help="comma list; default = all")
     ap.add_argument("--nights", type=int, default=2)
     ap.add_argument("--edit-budget", type=int, default=4, help="textual learning rate")
     ap.add_argument("--rollouts-k", type=int, default=1)
-    ap.add_argument("--gate", default="on", choices=["on", "off"])
+    ap.add_argument("--gate", default="on", choices=["on", "off"],
+                    help="off = arm C1 (no gate); on = arms C2/C3/C4 by --gate-metric")
+    ap.add_argument("--gate-metric", default="hard", choices=["hard", "soft", "mixed"],
+                    help="C2=hard, C3=soft, C4=mixed (used when --gate on)")
     ap.add_argument("--dream-factor", type=int, default=0, help="synthetic train variants per real task")
     ap.add_argument("--train-size", type=int, default=0, help="cap train pool (paper ablation a); 0 = all")
     ap.add_argument("--val-fraction", type=float, default=0.1, help="paper 4:1:5 -> val=0.1")
@@ -114,13 +118,14 @@ def main(argv=None) -> int:
         backend=args.backend, model=args.model,
         optimizer_backend=args.optimizer_backend, optimizer_model=args.optimizer_model,
         target_backend=args.target_backend, target_model=args.target_model,
-        codex_path=args.codex_path,
+        codex_path=args.codex_path, azure_endpoint=args.azure_endpoint,
     )
 
     results = []
     for fam in families:
         r = run_family(backend, fam, nights=args.nights, edit_budget=args.edit_budget,
                        rollouts_k=args.rollouts_k, gate_mode=("off" if args.gate == "off" else "on"),
+                       gate_metric=args.gate_metric,
                        dream_factor=args.dream_factor, train_size=args.train_size,
                        val_fraction=args.val_fraction, test_fraction=args.test_fraction,
                        seed=args.seed)
