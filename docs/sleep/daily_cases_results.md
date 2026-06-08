@@ -28,12 +28,18 @@ The ablation knobs from the paper are exposed as flags:
 
 ## Results
 
-_Real-model results are recorded here once the run completes; see the committed
-JSON alongside this file. The mock run confirms the plumbing and the
-anti-overfitting invariant (dream tasks only in train)._
+Real run, **gpt-5.5 optimizer → gpt-5.4-mini target** (Azure managed identity,
+the same models as the research blog), 4:1:5 split, 3 nights. Full C1-vs-C2
+ablation and analysis: [`blog_experiments.md`](blog_experiments.md).
 
-| Family | Held rule the optimizer must learn | Backend | Test before → after |
+| Family | House rule the optimizer must learn | Arm | Test before → after |
 |---|---|---|---|
-| math | answers wrapped in `\boxed{...}` | Sonnet→Haiku | _pending_ |
-| spreadsheet | formula starts with `=` and references a cell range | Sonnet→Haiku | _pending_ |
-| searchqa | answer cites a source as `[DOC n]` | Sonnet→Haiku | _pending_ |
+| math | answers wrapped in `\boxed{...}` | C1 / C2 | **0.00 → 1.00** / **0.00 → 1.00** |
+| spreadsheet | formula starts with `=` and references a cell range | C1 / C2 | **0.55 → 0.91** / 0.55 → 0.55 |
+| searchqa | answer cites a source as `[DOC n]` | C1 / C2 | **0.00 → 1.00** / **0.00 → 1.00** |
+
+C1 (no gate) improved **3/3** families; C2 (hard gate) **2/3**. The one
+difference — spreadsheet under the hard gate — is an honest small-validation-set
+effect documented in `blog_experiments.md` (and the reason the plugin defaults to
+the `mixed` gate metric). A reference run on Claude (Sonnet→Haiku) showed the same
+direction (spreadsheet 0.18→0.91, searchqa 0.00→1.00).

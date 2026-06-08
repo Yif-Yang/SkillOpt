@@ -1,0 +1,110 @@
+{
+  "benchmark": "skillopt-sleep/daily-cases",
+  "backend": "target=azure:gpt-5.4-mini/optimizer=azure:gpt-5.5",
+  "n_improved": 2,
+  "n_families": 3,
+  "results": [
+    {
+      "family": "math",
+      "split": {
+        "train": 12,
+        "val": 1,
+        "test": 7
+      },
+      "dream_train": 0,
+      "test_before": 0.0,
+      "test_after": 1.0,
+      "improved": true,
+      "nights": 1,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.0,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 1.0,
+          "test_hard": 1.0,
+          "action": "accept_new_best",
+          "edits": [
+            "For every math answer, include the final result in LaTeX boxed format containing"
+          ]
+        }
+      ],
+      "tokens": 14114
+    },
+    {
+      "family": "spreadsheet",
+      "split": {
+        "train": 6,
+        "val": 3,
+        "test": 11
+      },
+      "dream_train": 0,
+      "test_before": 0.545,
+      "test_after": 0.545,
+      "improved": false,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.545,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 1.0,
+          "test_hard": 0.545,
+          "action": "reject",
+          "edits": []
+        },
+        {
+          "night": 2,
+          "val_hard": 1.0,
+          "test_hard": 0.545,
+          "action": "reject",
+          "edits": []
+        },
+        {
+          "night": 3,
+          "val_hard": 1.0,
+          "test_hard": 0.545,
+          "action": "reject",
+          "edits": []
+        }
+      ],
+      "tokens": 35623
+    },
+    {
+      "family": "searchqa",
+      "split": {
+        "train": 3,
+        "val": 3,
+        "test": 14
+      },
+      "dream_train": 0,
+      "test_before": 0.0,
+      "test_after": 1.0,
+      "improved": true,
+      "nights": 1,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.0,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 1.0,
+          "test_hard": 1.0,
+          "action": "accept_new_best",
+          "edits": [
+            "Every response MUST include at least one source label matching the regex `/\\[DOC"
+          ]
+        }
+      ],
+      "tokens": 54375
+    }
+  ]
+}
