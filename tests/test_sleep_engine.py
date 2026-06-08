@@ -209,6 +209,35 @@ class TestRuleJudge(unittest.TestCase):
         self.assertAlmostEqual(s, 0.5)
 
 
+class TestDailyCases(unittest.TestCase):
+    def test_families_and_judges(self):
+        from skillopt_sleep.experiments.daily_cases import (
+            FAMILIES, make_tasks, DEFICIENT_SKILLS,
+        )
+        from skillopt_sleep.judges import score_rule_judge
+        self.assertEqual(set(FAMILIES), {"math", "spreadsheet", "searchqa"})
+        for fam in FAMILIES:
+            tasks = make_tasks(fam)
+            self.assertTrue(tasks and all(t.reference_kind == "rule" for t in tasks))
+            # the deficient skill text must FAIL the family judge (room to learn)
+            self.assertEqual(score_rule_judge(tasks[0].judge, DEFICIENT_SKILLS[fam])[0], 0.0)
+        # a correctly-formatted answer passes each judge
+        self.assertEqual(score_rule_judge(make_tasks("math")[0].judge, r"\boxed{60}")[0], 1.0)
+        self.assertEqual(score_rule_judge(make_tasks("searchqa")[0].judge, "Arthur Conan Doyle [DOC 2]")[0], 1.0)
+        self.assertEqual(score_rule_judge(make_tasks("spreadsheet")[0].judge, "=SUM(B2:B10)")[0], 1.0)
+
+    def test_dream_augment_never_in_holdout(self):
+        from skillopt_sleep.experiments.daily_cases import make_tasks, dream_augment
+        from skillopt_sleep.mine import assign_splits
+        real = assign_splits(make_tasks("math"), val_fraction=0.1, test_fraction=0.5, seed=42)
+        dream = dream_augment([t for t in real if t.split == "train"], factor=2)
+        tasks = real + dream
+        self.assertTrue(any(t.origin == "dream" for t in tasks))
+        for t in tasks:
+            if t.split in ("val", "test"):
+                self.assertEqual(t.origin, "real")
+
+
 class TestGbrainLoader(unittest.TestCase):
     def test_loads_when_present(self):
         from skillopt_sleep.experiments.gbrain_bench import find_data_root, load_seed
