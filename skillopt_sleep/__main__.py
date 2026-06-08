@@ -163,6 +163,31 @@ def cmd_harvest(args) -> int:
     return 0
 
 
+def cmd_schedule(args) -> int:
+    from skillopt_sleep.scheduler import schedule, list_scheduled
+    cfg = _cfg_from_args(args)
+    project = cfg.get("invoked_project") or os.getcwd()
+    ok, msg = schedule(project, backend=cfg.get("backend", "mock"),
+                       hour=args.hour, minute=args.minute,
+                       extra=("--auto-adopt" if getattr(args, "auto_adopt", False) else ""))
+    print("[sleep] " + msg)
+    cur = list_scheduled()
+    if cur:
+        print("[sleep] currently scheduled:")
+        for ln in cur:
+            print("   " + ln[:140])
+    return 0 if ok else 1
+
+
+def cmd_unschedule(args) -> int:
+    from skillopt_sleep.scheduler import unschedule
+    cfg = _cfg_from_args(args)
+    project = cfg.get("invoked_project") or os.getcwd()
+    ok, msg = unschedule(project, all_projects=getattr(args, "all", False))
+    print("[sleep] " + msg)
+    return 0 if ok else 1
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(prog="skillopt_sleep", description="SkillOpt-Sleep nightly self-evolution")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -178,6 +203,13 @@ def main(argv=None) -> int:
     p_adopt.add_argument("--staging", default="", help="specific staging dir")
     p_harvest = sub.add_parser("harvest", help="debug: show mined tasks")
     _add_common(p_harvest)
+    p_sched = sub.add_parser("schedule", help="install a nightly cron entry for this project")
+    _add_common(p_sched)
+    p_sched.add_argument("--hour", type=int, default=3)
+    p_sched.add_argument("--minute", type=int, default=17)
+    p_unsched = sub.add_parser("unschedule", help="remove the nightly cron entry")
+    _add_common(p_unsched)
+    p_unsched.add_argument("--all", action="store_true", help="remove all managed entries")
 
     args = parser.parse_args(argv)
     if args.cmd == "run":
@@ -190,6 +222,10 @@ def main(argv=None) -> int:
         return cmd_adopt(args)
     if args.cmd == "harvest":
         return cmd_harvest(args)
+    if args.cmd == "schedule":
+        return cmd_schedule(args)
+    if args.cmd == "unschedule":
+        return cmd_unschedule(args)
     parser.print_help()
     return 2
 

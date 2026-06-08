@@ -131,6 +131,37 @@ class TestMine(unittest.TestCase):
         self.assertTrue(any(t.split == "val" for t in tasks))
 
 
+class TestScheduler(unittest.TestCase):
+    def test_install_idempotent_and_remove(self):
+        import skillopt_sleep.scheduler as s
+        state = {"cron": "0 0 * * * echo user-job\n"}
+        orig = (s._have_crontab, s._read_crontab, s._write_crontab)
+        try:
+            s._have_crontab = lambda: True
+            s._read_crontab = lambda: state["cron"]
+            def _w(c):
+                state["cron"] = c
+                return True
+            s._write_crontab = _w
+            ok, _ = s.schedule("/p/proj", backend="claude", hour=3, minute=17)
+            self.assertTrue(ok)
+            self.assertIn("user-job", state["cron"])          # preserves user jobs
+            self.assertEqual(len(s.list_scheduled()), 1)
+            # re-schedule same project -> no duplicate, backend updated
+            s.schedule("/p/proj", backend="codex")
+            self.assertEqual(len(s.list_scheduled()), 1)
+            self.assertIn("--backend codex", state["cron"])
+            # second project -> 2 entries
+            s.schedule("/p/other", backend="mock")
+            self.assertEqual(len(s.list_scheduled()), 2)
+            # unschedule one
+            s.unschedule("/p/proj")
+            self.assertEqual(len(s.list_scheduled()), 1)
+            self.assertIn("user-job", state["cron"])
+        finally:
+            s._have_crontab, s._read_crontab, s._write_crontab = orig
+
+
 class TestConsolidateGate(unittest.TestCase):
     def test_accepts_helpful_rejects_harmful(self):
         be = MockBackend()
