@@ -62,9 +62,12 @@ def run_bench(backend, bench, *, n_train, dream_factor, nights, edit_budget,
                           evolve_skill=True, evolve_memory=False, night=night)
         if res.accepted:
             cur = res.new_skill
-        th = _score(backend, tasks, cur, "test")
+        # the full TEST set is the FINAL measure — we do NOT re-score it every
+        # night (that is the dominant, wasteful cost). We track the VAL score per
+        # night (already computed inside consolidate) and score TEST once at the
+        # end. This changes nothing about the reported baseline/after numbers.
         trace.append({"night": night, "val_hard": round(res.holdout_candidate, 4),
-                      "test_hard": round(th, 4), "action": res.gate_action,
+                      "action": res.gate_action,
                       "edits": [e.content[:90] for e in res.applied_edits]})
     after = _score(backend, tasks, cur, "test")
     return {
