@@ -63,13 +63,37 @@ def replay_one(backend: Backend, task: TaskRecord, skill: str, memory: str) -> R
     )
 
 
+import os
+from concurrent.futures import ThreadPoolExecutor
+
+
 def replay_batch(
     backend: Backend,
     tasks: List[TaskRecord],
     skill: str,
     memory: str,
+    *,
+    workers: int = 0,
 ) -> List[Tuple[TaskRecord, ReplayResult]]:
-    return [(t, replay_one(backend, t, skill, memory)) for t in tasks]
+    """Replay tasks, optionally in parallel.
+
+    Real backends are network-bound, so a thread pool gives a large speedup on
+    big test sets (like the research harness's --workers). ``workers`` defaults
+    to env SKILLOPT_SLEEP_WORKERS or 1 (sequential). Mock stays sequential
+    (deterministic) unless asked otherwise.
+    """
+    if workers <= 0:
+        workers = int(os.environ.get("SKILLOPT_SLEEP_WORKERS", "1") or "1")
+    if workers <= 1 or len(tasks) <= 1:
+        return [(t, replay_one(backend, t, skill, memory)) for t in tasks]
+    results: List = [None] * len(tasks)
+    with ThreadPoolExecutor(max_workers=min(workers, len(tasks))) as ex:
+        futs = {ex.submit(replay_one, backend, t, skill, memory): i
+                for i, t in enumerate(tasks)}
+        for fut in futs:
+            i = futs[fut]
+            results[i] = (tasks[i], fut.result())
+    return results
 
 
 def aggregate_scores(pairs: List[Tuple[TaskRecord, ReplayResult]]) -> Tuple[float, float]:
