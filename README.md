@@ -78,6 +78,16 @@ harvest session transcripts → mine recurring tasks → replay offline
 | **Codex** | [`plugins/codex`](plugins/codex) | `bash plugins/codex/install.sh` → `/skillopt-sleep` |
 | **Copilot** | [`plugins/copilot`](plugins/copilot) | register `plugins/copilot/mcp_server.py` as an MCP server |
 
+**You stay in control.** Tell it your house rules with `--preferences "..."`,
+keep the held-out `--gate` strict or go greedy, learn from contrast with
+`--rollouts-k`, optimize on a cheap model and deploy anywhere
+(`--optimizer-model`/`--target-model`), cap spend with `--budget-tokens`, and run
+it automatically every night with the built-in `/skillopt-sleep schedule`. The
+training set can be *dreamed* (synthetic), while validation and test stay your
+**real** held-out tasks. Full guide:
+[`plugins/README.md`](plugins/README.md) and
+[`docs/sleep/CONTROLLABLE_DREAMING.md`](docs/sleep/CONTROLLABLE_DREAMING.md).
+
 **Validated on real models.** On the public
 [gbrain-evals](https://github.com/garrytan/gbrain-evals) `skillopt-v1` benchmark,
 deficient skills go **0.00 → 1.00** on held-out sets with **both Claude and
