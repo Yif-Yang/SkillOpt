@@ -21,8 +21,8 @@ literature (short-term experience → long-term competence).
 
 | Platform | Folder | Mechanism | Status |
 |---|---|---|---|
-| **Claude Code** | [`claude-code/`](claude-code) | `.claude-plugin` + `/sleep` command + skill + hooks | full, installable |
-| **Codex** | [`codex/`](codex) | `~/.codex/prompts/sleep.md` + `~/.agents/skills` + `AGENTS.md` | full |
+| **Claude Code** | [`claude-code/`](claude-code) | `.claude-plugin` + `/skillopt-sleep` command + skill + hooks | full, installable |
+| **Codex** | [`codex/`](codex) | `~/.codex/prompts/skillopt-sleep.md` + `~/.agents/skills` + `AGENTS.md` | full |
 | **Copilot** | [`copilot/`](copilot) | MCP server (`sleep_*` tools) + `copilot-instructions` | full (MCP) |
 
 All three call the **same** [`plugins/run-sleep.sh`](run-sleep.sh) → `python -m
@@ -36,7 +36,7 @@ git clone <repo-url> && cd SkillOpt-Sleep
 # Claude Code:
 /plugin marketplace add ./plugins/claude-code
 /plugin install skillopt-sleep@skillopt-sleep
-/sleep status
+/skillopt-sleep status
 ```
 Codex: `bash plugins/codex/install.sh`.
 Copilot: register `plugins/copilot/mcp_server.py` as an MCP server.

@@ -23,7 +23,7 @@ from scratch for this test. Two forms were used:
 | Shell | What was run | Result |
 |---|---|---|
 | **Claude Code** (`scripts/sleep.sh`) | `harvest`, full `run`, `adopt` | harvest found 2 sessions → 2 tasks; `run` staged a proposal; `adopt` honored the safety contract (no live change when nothing was accepted) |
-| **Codex** (`install.sh` + shared runner) | `install.sh` into a temp HOME | placed `~/.codex/prompts/sleep.md` and `~/.agents/skills/skillopt-sleep/SKILL.md` correctly |
+| **Codex** (`install.sh` + shared runner) | `install.sh` into a temp HOME | placed `~/.codex/prompts/skillopt-sleep.md` and `~/.agents/skills/skillopt-sleep/SKILL.md` correctly |
 | **Copilot** (`mcp_server.py`) | `initialize` → `tools/list` → `tools/call sleep_harvest` | 5 tools listed; `sleep_harvest` returned real engine output (2 sessions → 2 tasks) |
 
 ### Genuine improvement (real model, fresh persona)

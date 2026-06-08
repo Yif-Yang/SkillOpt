@@ -1,7 +1,7 @@
-# /sleep — SkillOpt-Sleep for Codex
+# /skillopt-sleep — SkillOpt-Sleep for Codex
 #
-# Custom prompt: copy this file to ~/.codex/prompts/sleep.md and invoke with
-# `/sleep` in the Codex CLI. ($ARGUMENTS is the text after /sleep.)
+# Custom prompt: copy this file to ~/.codex/prompts/skillopt-sleep.md and invoke with
+# `/skillopt-sleep` in the Codex CLI. ($ARGUMENTS is the text after /skillopt-sleep.)
 
 Run the SkillOpt-Sleep offline self-evolution cycle. Action: $ARGUMENTS
 (empty → "status").

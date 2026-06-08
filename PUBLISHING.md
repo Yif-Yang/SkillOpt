@@ -16,7 +16,7 @@ The Claude Code plugin ships a marketplace manifest at
 # inside Claude Code:
 /plugin marketplace add microsoft/SkillOpt
 /plugin install skillopt-sleep
-/sleep status
+/skillopt-sleep status
 ```
 
 (`/plugin marketplace add <owner>/<repo>` reads the marketplace manifest from the
@@ -27,9 +27,9 @@ repo; the entry points at `plugins/claude-code`.)
 ```bash
 git clone https://github.com/microsoft/SkillOpt.git
 cd SkillOpt
-bash plugins/codex/install.sh           # installs /sleep prompt + skill
+bash plugins/codex/install.sh           # installs /skillopt-sleep prompt + skill
 export SKILLOPT_SLEEP_REPO="$(pwd)"      # so the runner is found anywhere
-# then, in Codex:  /sleep status
+# then, in Codex:  /skillopt-sleep status
 ```
 
 ### Copilot

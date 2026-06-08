@@ -40,7 +40,7 @@ both weight-free and regression-protected.
 ## 3. Goals / non-goals
 
 **Goals**
-1. A working Claude Code plugin: scheduled (nightly/cron) **and** user-triggered (`/sleep`).
+1. A working Claude Code plugin: scheduled (nightly/cron) **and** user-triggered (`/skillopt-sleep`).
 2. Look back over the user's real past prompts & trajectories from local `~/.claude` records.
 3. Offline "dream training": re-run mined tasks (mock-env or fresh retry) on the user's budget.
 4. Continuous evolution of **memory** (`CLAUDE.md`) and **skills** (`SKILL.md`) via the SkillOpt gate.
@@ -74,7 +74,7 @@ optimizer/replay calls the user already pays for.
             │                                                                                │
  trigger →  │  1.HARVEST     2.MINE          3.REPLAY            4.CONSOLIDATE      5.STAGE   │ → wake report
  (cron or   │  read ~/.claude scan sessions  re-run tasks        SkillOpt epoch:   write to   │
-  /sleep)   │  transcripts → → task records   offline (mock or    reflect→edit→     .skillopt-│
+  /skillopt-sleep)   │  transcripts → → task records   offline (mock or    reflect→edit→     .skillopt-│
             │  + history     w/ outcomes &    fresh retry) under  GATE on held-out  sleep/    │
             │                checkable refs   current skill/mem    replay split      staging/ │
             │                                                                          ↓      │
@@ -120,7 +120,7 @@ Write `proposed_CLAUDE.md`, `proposed_SKILL.md`, a unified diff, and a
 `<project>/.skillopt-sleep/staging/<date>/`. **Nothing live is modified.**
 
 **6. Adopt**
-`/sleep adopt` (or `auto_adopt: true` in config for power users) copies staged
+`/skillopt-sleep adopt` (or `auto_adopt: true` in config for power users) copies staged
 files over the live `CLAUDE.md` / `SKILL.md`, after a `git`-style backup. This
 is the only stage that mutates user-facing config, and it is explicit by default
 — the Dreams "review the output, then adopt or discard" contract.
@@ -144,7 +144,7 @@ skillopt/sleep/
 
 skillopt-sleep-plugin/            # the Claude Code plugin surface
   .claude-plugin/plugin.json
-  commands/sleep.md               # /sleep [run|status|adopt|dry-run]
+  commands/sleep.md               # /skillopt-sleep [run|status|adopt|dry-run]
   commands/sleep-status.md
   skills/skillopt-sleep/SKILL.md  # so Claude knows how to drive the engine
   hooks/hooks.json                # optional: schedule + on-session-end harvest
@@ -172,7 +172,7 @@ history.jsonl + <session>.jsonl
 ## 6. Scheduling & triggering
 
 - **Cron/scheduled:** documented `crontab` line + an optional Claude Code hook; default `0 3 * * *` (3am local; pick an off-:00 minute in practice). The engine is a plain CLI so it works under cron, systemd-timer, or the Claude Code scheduler.
-- **User-triggered:** `/sleep run` (full cycle), `/sleep dry-run` (harvest+mine+replay, no edits), `/sleep status`, `/sleep adopt`.
+- **User-triggered:** `/skillopt-sleep run` (full cycle), `/skillopt-sleep dry-run` (harvest+mine+replay, no edits), `/skillopt-sleep status`, `/skillopt-sleep adopt`.
 - **On-session-end harvest (optional hook):** cheaply append the just-finished session to the night's buffer so the 3am run has fresh data without a full rescan.
 
 ## 7. Safety model (hard requirements)
@@ -220,7 +220,7 @@ The engine is domain-agnostic; the persona only changes which tasks get mined.
 
 - **Phase 0 — scaffold + types + harvest** (read-only, no API). Provable on this box's real `~/.claude`.
 - **Phase 1 — mine + replay(mock) + consolidate + gate + staging**, with the **mock** optimizer backend and the deterministic experiment green. *(primary deliverable of the offline session)*
-- **Phase 2 — plugin surface** (`/sleep`, skill, hooks, plugin.json) wired to the CLI.
+- **Phase 2 — plugin surface** (`/skillopt-sleep`, skill, hooks, plugin.json) wired to the CLI.
 - **Phase 3 — real Anthropic backend** for miner/reflect/judge + `fresh` replay in worktrees.
 - **Phase 4 — slow/meta cross-night memory**, adopt automation, multi-project, polish + docs.
 

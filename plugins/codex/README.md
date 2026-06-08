@@ -23,7 +23,7 @@ three, plus a shared runner.
 ```bash
 git clone <repo-url> SkillOpt-Sleep
 cd SkillOpt-Sleep
-bash plugins/codex/install.sh          # installs the /sleep prompt + skill
+bash plugins/codex/install.sh          # installs the /skillopt-sleep prompt + skill
 export SKILLOPT_SLEEP_REPO="$(pwd)"    # so the runner is found from anywhere
 ```
 
@@ -32,10 +32,10 @@ Requires Python ≥ 3.10 and the `codex` CLI on PATH.
 ## Use
 
 ```text
-/sleep status      # what's happened
-/sleep dry-run     # safe preview, stages nothing
-/sleep run         # full cycle, stages a reviewed proposal (no live edits)
-/sleep adopt       # apply the staged proposal (with backup)
+/skillopt-sleep status      # what's happened
+/skillopt-sleep dry-run     # safe preview, stages nothing
+/skillopt-sleep run         # full cycle, stages a reviewed proposal (no live edits)
+/skillopt-sleep adopt       # apply the staged proposal (with backup)
 ```
 
 Or call the engine directly:

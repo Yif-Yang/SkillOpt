@@ -9,10 +9,10 @@ AGENTS_SKILLS="${HOME}/.agents/skills"
 
 echo "[install] repo: $REPO_ROOT"
 
-# 1) custom /sleep prompt
+# 1) custom /skillopt-sleep prompt
 mkdir -p "$CODEX_HOME/prompts"
-cp "$REPO_ROOT/plugins/codex/prompts/sleep.md" "$CODEX_HOME/prompts/sleep.md"
-echo "[install] /sleep prompt   -> $CODEX_HOME/prompts/sleep.md"
+cp "$REPO_ROOT/plugins/codex/prompts/skillopt-sleep.md" "$CODEX_HOME/prompts/skillopt-sleep.md"
+echo "[install] /skillopt-sleep prompt   -> $CODEX_HOME/prompts/skillopt-sleep.md"
 
 # 2) user-level skill
 mkdir -p "$AGENTS_SKILLS/skillopt-sleep"
@@ -30,7 +30,7 @@ cat <<EOF
 
   ## SkillOpt-Sleep
   An offline self-improvement cycle is available. To run it:
-  \`bash "$REPO_ROOT/plugins/run-sleep.sh" status\`. Use \`/sleep\` for the guided flow.
+  \`bash "$REPO_ROOT/plugins/run-sleep.sh" status\`. Use \`/skillopt-sleep\` for the guided flow.
 
-Done. Try:  /sleep status
+Done. Try:  /skillopt-sleep status
 EOF
