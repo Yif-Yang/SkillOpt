@@ -105,12 +105,26 @@ def _eq(a, b) -> bool:
     return ta == tb
 
 
+def _iter_coords(ws, cell_range: str):
+    """Yield cell coordinates for a range, robust to single-cell / single-row."""
+    sel = ws[cell_range]
+    # openpyxl returns: a Cell (single), a tuple of Cells (single row/col), or a
+    # tuple of tuples of Cells (rectangular range).
+    if hasattr(sel, "coordinate"):           # single Cell
+        yield sel.coordinate
+        return
+    for row in sel:
+        if hasattr(row, "coordinate"):       # single row/col -> row is a Cell
+            yield row.coordinate
+        else:
+            for cell in row:
+                yield cell.coordinate
+
+
 def _cell_range(ws_gt, ws_pr, cell_range: str) -> bool:
-    for row in ws_gt[cell_range]:
-        for cell in (row if isinstance(row, tuple) else (row,)):
-            coord = cell.coordinate
-            if not _eq(cell.value, ws_pr[coord].value):
-                return False
+    for coord in _iter_coords(ws_gt, cell_range):
+        if not _eq(ws_gt[coord].value, ws_pr[coord].value):
+            return False
     return True
 
 
