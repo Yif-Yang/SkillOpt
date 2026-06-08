@@ -70,7 +70,16 @@ def _livemath_task(it: dict, split: str) -> TaskRecord:
 
 def _spreadsheet_task(it: dict, split: str, data_root: str) -> TaskRecord:
     instr = str(it.get("instruction", it.get("question", "")))
-    intent = (f"## Spreadsheet task\n{instr}{_ANSWER_FMT}")
+    pos = it.get("answer_position", "")
+    intent = (
+        "## Spreadsheet task (write Python code)\n"
+        f"Instruction: {instr}\n"
+        f"Target answer cells: {pos}\n\n"
+        "Write Python using openpyxl that reads the workbook at the variable "
+        "INPUT_PATH, performs the manipulation, and saves the result to "
+        "OUTPUT_PATH. INPUT_PATH and OUTPUT_PATH are already defined — do NOT "
+        "reassign them. Put ONLY the code in a single ```python ... ``` block."
+    )
     return TaskRecord(
         id=f"spreadsheet:{it.get('id','')}", project="/bench/spreadsheet", intent=intent,
         reference_kind="answer",
