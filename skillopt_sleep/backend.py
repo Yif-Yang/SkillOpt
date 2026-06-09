@@ -857,6 +857,99 @@ class AzureOpenAIBackend(CliBackend):
         return ""
 
 
+class AzureResponsesBackend(AzureOpenAIBackend):
+    """gpt-5.x via the **Responses API** on the high-throughput gpt4v endpoints.
+
+    Differs from AzureOpenAIBackend in three ways, all required by the enhanced
+    experiment:
+      * Auth via ``AzureCliCredential`` (the logged-in user), not Managed Identity
+        — the gpt4v-scus/swc accounts grant the data role to the CLI principal.
+      * Calls ``client.responses.create`` (the /responses API) instead of
+        chat.completions — these deployments are Responses-only.
+      * Round-robins across multiple endpoints for parallel throughput; each
+        worker thread binds a client for one endpoint (picked by thread index)
+        so concurrent replay spreads load across all endpoints.
+
+    A single shared ``AzureCliCredential`` token provider is reused across all
+    endpoint clients (the token is cached + auto-refreshed by the provider).
+    """
+
+    name = "azure-responses"
+
+    # the two parallel /responses endpoints (user-provided), both hosting gpt-5.5
+    _RESP_ENDPOINTS = [
+        "https://gpt4v-scus.openai.azure.com/",
+        "https://gpt4v-swc.openai.azure.com/",
+    ]
+
+    def __init__(self, deployment: str = "", endpoints: Optional[List[str]] = None,
+                 timeout: int = 180, api_version: str = "2025-04-01-preview") -> None:
+        super().__init__(deployment=deployment, endpoint=(endpoints or self._RESP_ENDPOINTS)[0],
+                         timeout=timeout, api_version=api_version)
+        self.endpoints = list(endpoints or self._RESP_ENDPOINTS)
+        self.name = f"azure-responses:{self.deployment}"
+        self._token_provider = None
+        self._clients: dict = {}      # endpoint -> AzureOpenAI client
+        import threading as _thr
+        self._lock = _thr.Lock()
+        self._rr = 0                  # round-robin counter
+
+    def _get_provider(self):
+        if self._token_provider is None:
+            from azure.identity import AzureCliCredential, get_bearer_token_provider
+            self._token_provider = get_bearer_token_provider(
+                AzureCliCredential(), "https://cognitiveservices.azure.com/.default")
+        return self._token_provider
+
+    def _client_for(self, endpoint: str):
+        cl = self._clients.get(endpoint)
+        if cl is None:
+            from openai import AzureOpenAI
+            cl = AzureOpenAI(
+                azure_endpoint=endpoint, azure_ad_token_provider=self._get_provider(),
+                api_version=self.api_version, max_retries=2,
+            )
+            self._clients[endpoint] = cl
+        return cl
+
+    def _next_endpoint(self) -> str:
+        # round-robin so concurrent calls spread across all endpoints
+        with self._lock:
+            ep = self.endpoints[self._rr % len(self.endpoints)]
+            self._rr += 1
+        return ep
+
+    def _call(self, prompt: str, *, max_tokens: int = 1024, retries: int = 5) -> str:
+        import random as _r
+        import time as _t
+        last = None
+        base_ep = self._next_endpoint()           # this call's primary endpoint
+        base_idx = self.endpoints.index(base_ep)
+        for attempt in range(max(1, retries)):
+            # on retry, fail over to the other endpoint(s)
+            ep = self.endpoints[(base_idx + attempt) % len(self.endpoints)]
+            try:
+                client = self._client_for(ep)
+                resp = client.responses.create(
+                    model=self.deployment, input=prompt,
+                    max_output_tokens=16384,
+                )
+                text = (getattr(resp, "output_text", "") or "").strip()
+                try:
+                    u = resp.usage
+                    self._tokens += (getattr(u, "input_tokens", 0) or 0) + (getattr(u, "output_tokens", 0) or 0)
+                except Exception:
+                    pass
+                if text:
+                    return text
+                last = "empty-response"
+            except Exception as e:  # noqa: BLE001
+                last = e
+            if attempt < retries - 1:
+                _t.sleep(min(8.0, (2 ** attempt) * 0.5) + _r.random() * 0.4)
+        return ""
+
+
 def get_backend(
     name: str,
     *,
@@ -872,6 +965,9 @@ def get_backend(
         return CodexCliBackend(model=model, codex_path=codex_path)
     if n in {"azure", "azure_openai", "aoai"}:
         return AzureOpenAIBackend(deployment=model, endpoint=azure_endpoint)
+    if n in {"azure-responses", "azure_responses", "aoai-responses", "responses"}:
+        eps = [e.strip() for e in azure_endpoint.split(",") if e.strip()] or None
+        return AzureResponsesBackend(deployment=model, endpoints=eps)
     return MockBackend()
 
 
