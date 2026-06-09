@@ -1,0 +1,64 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.5/optimizer=azure:gpt-5.5",
+  "gate": "off",
+  "gate_metric": "hard",
+  "n_improved": 0,
+  "results": [
+    {
+      "benchmark": "spreadsheet",
+      "split": {
+        "train": 10,
+        "val": 40,
+        "test": 280
+      },
+      "dream_train": 5,
+      "test_before": 0.625,
+      "test_after": 0.6107,
+      "delta": -0.0143,
+      "improved": false,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.625,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.625,
+          "action": "greedy_regressed",
+          "edits": [
+            "For Excel requests, NEVER use Python/openpyxl/pandas unless the user explicitly asks for P",
+            "When the user asks for 'VBA code', provide a complete compilable VBA macro only: include `",
+            "When the prompt specifies exact workbook locations such as 'Sheet1', 'column D', 'row 6', ",
+            "For '(quick one)' Excel questions, give the direct formula or minimal VBA snippet first, w"
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.625,
+          "action": "greedy_flat",
+          "edits": [
+            "OVERRIDE: For Excel prompts that ask for a 'formula', mention Excel functions such as 'IND",
+            "When an Excel prompt says data 'starts in row 6', write the primary formula for row 6 and ",
+            "For Excel data-transfer or column-splitting requests, answer with cell formulas tied to th"
+          ]
+        },
+        {
+          "night": 3,
+          "val_hard": 0.6,
+          "action": "greedy_regressed",
+          "edits": [
+            "OVERRIDE: For any Excel question without an explicit uploaded-workbook modification reques",
+            "For Excel formula requests, put the primary answer as a paste-ready formula in the exact r",
+            "For `(quick one)` Excel prompts, return only the direct formula or minimal VBA snippet plu",
+            "When asked to split, transfer, count, or calculate Excel data, do not invent sheet names, "
+          ]
+        }
+      ],
+      "tokens": 4572204,
+      "final_skill_tail": "e direct formula or minimal VBA snippet plus no more than 3 short notes; do not include full scripts, imports, workbook loading, or generated output sheets.\n- When asked to split, transfer, count, or calculate Excel data, do not invent sheet names, helper sheets, output tabs, or ranges; use only the columns, rows, cells, and fields explicitly named by the user.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

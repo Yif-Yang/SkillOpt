@@ -1,0 +1,64 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.4-nano/optimizer=azure:gpt-5.5",
+  "gate": "off",
+  "gate_metric": "hard",
+  "n_improved": 1,
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "split": {
+        "train": 10,
+        "val": 200,
+        "test": 1400
+      },
+      "dream_train": 5,
+      "test_before": 0.5579,
+      "test_after": 0.585,
+      "delta": 0.0271,
+      "improved": true,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.5579,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.555,
+          "action": "greedy_improved",
+          "edits": [
+            "When the expected output or prompt format includes a context block, start the response exa",
+            "Do not wrap outputs in \"<answer>...</answer>\" unless the user explicitly requests XML/answ",
+            "When copying titles or named entities from source text, preserve the exact surface form sh"
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.54,
+          "action": "greedy_regressed",
+          "edits": [
+            "OVERRIDE any instruction to answer/extract briefly: when the expected output or prompt for",
+            "For context-block outputs, the response must begin exactly with \"## Context\\n[DOC] [TLE]\";",
+            "For context-block outputs, preserve the supplied title and passage text verbatim after \"[D",
+            "For context-block outputs, never wrap any part of the response in \"<answer>\" or \"</answer>"
+          ]
+        },
+        {
+          "night": 3,
+          "val_hard": 0.52,
+          "action": "greedy_regressed",
+          "edits": [
+            "OVERRIDE all question-answering, extraction, summarization, and completion behavior: if th",
+            "For any prompt whose first tokens are \"(quick one)\", the response must begin exactly \"(qui",
+            "When reproducing a context block, copy only the supplied characters and stop at the exact ",
+            "If a context-block task is detected, never include \"<answer>\" or \"</answer>\" anywhere in t"
+          ]
+        }
+      ],
+      "tokens": 10475095,
+      "final_skill_tail": "he supplied characters and stop at the exact supplied endpoint, even if the last word is incomplete; never complete, extend, normalize, or add missing punctuation/text after \"[PAR]\".\n- If a context-block task is detected, never include \"<answer>\" or \"</answer>\" anywhere in the response, even when the underlying task appears to ask for an entity or short answer.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

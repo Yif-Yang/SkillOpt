@@ -1,0 +1,65 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.4-nano/optimizer=azure:gpt-5.5",
+  "gate": "off",
+  "gate_metric": "hard",
+  "n_improved": 0,
+  "results": [
+    {
+      "benchmark": "spreadsheet",
+      "split": {
+        "train": 10,
+        "val": 40,
+        "test": 280
+      },
+      "dream_train": 5,
+      "test_before": 0.2893,
+      "test_after": 0.2393,
+      "delta": -0.05,
+      "improved": false,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.2893,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.2,
+          "action": "greedy_improved",
+          "edits": [
+            "For workbook-editing tasks, return one executable Python script only; never include `INPUT",
+            "Do not assume sheet names such as `'Input'`, `'Output'`, or the first sheet unless the use",
+            "When the user specifies structural anchors, follow them exactly: if data starts in `row 6`",
+            "For Excel formula/VBA requests, provide the requested Excel formula or VBA code rather tha"
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.275,
+          "action": "greedy_improved",
+          "edits": [
+            "OVERRIDE: When a prompt asks for an Excel formula or Excel-help wording such as 'How can I",
+            "For formula/help tasks, never wrap the answer in ```python```; if code fencing is useful, ",
+            "When the user gives exact spreadsheet placement such as 'data starts in row 6' or 'column ",
+            "For quick Excel questions marked '(quick one)', keep the answer concise: provide the formu"
+          ]
+        },
+        {
+          "night": 3,
+          "val_hard": 0.175,
+          "action": "greedy_regressed",
+          "edits": [
+            "OVERRIDE: If the prompt contains '# Instruction' or '(quick one) # Instruction' and does n",
+            "OVERRIDE: For any Excel prompt asking 'How can I', 'I need a formula', 'I'm struggling', '",
+            "For '(quick one)' prompts, keep the entire response under 1200 characters and include only",
+            "Only return workbook-editing Python when the user explicitly asks to edit/save a workbook "
+          ]
+        }
+      ],
+      "tokens": 2690929,
+      "final_skill_tail": " columns.\n- Only return workbook-editing Python when the user explicitly asks to edit/save a workbook file or provides an input/output workbook path; otherwise, Excel-related transformation requests such as counting items in a cell, splitting column text into columns, transferring table data, or calculating values in a column require formulas or Excel UI steps.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

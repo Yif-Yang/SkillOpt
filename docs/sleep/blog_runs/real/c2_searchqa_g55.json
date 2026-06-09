@@ -1,0 +1,62 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.5/optimizer=azure:gpt-5.5",
+  "gate": "on",
+  "gate_metric": "hard",
+  "n_improved": 1,
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "split": {
+        "train": 10,
+        "val": 200,
+        "test": 1400
+      },
+      "dream_train": 5,
+      "test_before": 0.7929,
+      "test_after": 0.81,
+      "delta": 0.0171,
+      "improved": true,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.7929,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.76,
+          "action": "accept_new_best",
+          "edits": [
+            "When the requested output is a source/context snippet, output the full context block start",
+            "Do not use `<answer>...</answer>` tags unless the user explicitly requests XML/answer tags",
+            "Preserve titles, locations, punctuation, and line breaks exactly from the provided text, i"
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.775,
+          "action": "accept_new_best",
+          "edits": [
+            "OVERRIDE: When the requested/expected format starts with `## Context`, return the context ",
+            "For `## Context` outputs, the next copied text must preserve the literal structure `[DOC] ",
+            "If the prompt says `(quick one)`, still follow the full requested output format exactly; `"
+          ]
+        },
+        {
+          "night": 3,
+          "val_hard": 0.78,
+          "action": "accept_new_best",
+          "edits": [
+            "OVERRIDE: If the requested output begins with `(quick one) ## Context`, the response must ",
+            "OVERRIDE: For any requested output containing `## Context`, the first characters of the re",
+            "When copying a `## Context` snippet, stop exactly at the end of the requested snippet; do "
+          ]
+        }
+      ],
+      "tokens": 10488328,
+      "final_skill_tail": "ither `## Context` or `(quick one) ## Context` as shown in the request; never begin with `<answer>`, an entity name, or any text before that prefix.\n- When copying a `## Context` snippet, stop exactly at the end of the requested snippet; do not append extra words, punctuation, commas, locations, or continuation text beyond the final character shown or required.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

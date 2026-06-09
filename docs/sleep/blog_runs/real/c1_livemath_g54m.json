@@ -1,0 +1,65 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.4-mini/optimizer=azure:gpt-5.5",
+  "gate": "off",
+  "gate_metric": "hard",
+  "n_improved": 0,
+  "results": [
+    {
+      "benchmark": "livemath",
+      "split": {
+        "train": 10,
+        "val": 18,
+        "test": 124
+      },
+      "dream_train": 5,
+      "test_before": 0.2823,
+      "test_after": 0.2419,
+      "delta": -0.0403,
+      "improved": false,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.2823,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.1667,
+          "action": "greedy_regressed",
+          "edits": [
+            "For multiple-choice math questions, privately solve the problem before looking for the nea",
+            "When a question contains exact hypotheses or thresholds such as `2/15+\\varepsilon<\\theta<1",
+            "For algebraic, combinatorial, and PDE/analysis MCQs, verify the claimed conclusion by at l",
+            "If confidence in the selected MCQ letter is below 80%, do a second pass explicitly trying "
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.2222,
+          "action": "greedy_improved",
+          "edits": [
+            "For group-presentation/abelianization MCQs such as questions asking for `H(n,m)^{\\mathrm{a",
+            "For analytic-number-theory MCQs with a parameter range like `2/15+\\varepsilon<\\theta<1-\\de",
+            "For shifted/extremal hypergraph MCQs with `k\\in\\{2,3\\}` and `H\\subseteq \\binom{[n]}{k}`, p",
+            "For elliptic/PDE MCQs, when hypotheses include thresholds such as `1<p<\\frac{2^*}{2}` for "
+          ]
+        },
+        {
+          "night": 3,
+          "val_hard": 0.3333,
+          "action": "greedy_improved",
+          "edits": [
+            "OVERRIDE for repeated MCQ misses: before emitting `<answer>LETTER</answer>`, make a privat",
+            "For cyclic/group-presentation abelianization questions with `n\\ge 1` and `0\\le m<n`, do no",
+            "For shifted hypergraph MCQs, verify the proposed statement separately for both `k=2` and `",
+            "For 2D Liouville/blow-up equations on a bounded open set `\\Omega\\subset\\mathbb R^2` contai"
+          ]
+        }
+      ],
+      "tokens": 881268,
+      "final_skill_tail": "` or `k=3`.\n- For 2D Liouville/blow-up equations on a bounded open set `\\Omega\\subset\\mathbb R^2` containing `0`, with weights like `(\\varepsilon_n^2+|x|^2)^\\rho`, distinguish ordinary blow-up mass `8\\pi` from singular-origin mass `8\\pi(1+\\rho)`; choose only an option whose quantization/lower-bound constants match whether blow-up occurs at `0` or away from `0`.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

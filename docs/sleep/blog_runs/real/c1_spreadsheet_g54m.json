@@ -1,0 +1,65 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.4-mini/optimizer=azure:gpt-5.5",
+  "gate": "off",
+  "gate_metric": "hard",
+  "n_improved": 0,
+  "results": [
+    {
+      "benchmark": "spreadsheet",
+      "split": {
+        "train": 10,
+        "val": 40,
+        "test": 280
+      },
+      "dream_train": 5,
+      "test_before": 0.3607,
+      "test_after": 0.2714,
+      "delta": -0.0893,
+      "improved": false,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.3607,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.325,
+          "action": "greedy_improved",
+          "edits": [
+            "For Excel/spreadsheet tasks, inspect the actual workbook structure before writing: use exi",
+            "When the user asks for a formula or says a result belongs in a specific Excel column/cell,",
+            "Only modify the requested output cells/columns/ranges; preserve all unrelated workbook cel",
+            "For executable workbook solutions, use the provided INPUT_PATH and OUTPUT_PATH variables e"
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.275,
+          "action": "greedy_regressed",
+          "edits": [
+            "OVERRIDE: When the prompt asks for “a formula”, “How can I”, or otherwise requests an Exce",
+            "To prevent “cell-mismatch”, never choose target cells with ws.active or guessed positions;",
+            "If the prompt says data starts in a specific row such as “row 6”, use that row verbatim fo",
+            "For formula-fill tasks, write formulas only in the requested output column/cells, leave he"
+          ]
+        },
+        {
+          "night": 3,
+          "val_hard": 0.125,
+          "action": "greedy_regressed",
+          "edits": [
+            "OVERRIDE: If the prompt asks “How can I”, “I need a formula”, “I attempted to use”, or is ",
+            "Before any workbook-writing code, require an explicit request to edit/save the file (for e",
+            "For Excel formula answers, if the user gives a target column/cell or start row such as “co",
+            "When asked to count, split, filter, or transfer values in Excel cells/tables, prefer nativ"
+          ]
+        }
+      ],
+      "tokens": 1712998,
+      "final_skill_tail": " starts in row 6) and say to fill down; never invent ranges such as H3:H6.\n- When asked to count, split, filter, or transfer values in Excel cells/tables, prefer native Excel formulas using functions such as TEXTSPLIT, FILTER, LEFT, COUNTA, SUM, INDEX, MATCH, XLOOKUP, or structured references; do not use regex/Python for those tasks unless explicitly requested.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

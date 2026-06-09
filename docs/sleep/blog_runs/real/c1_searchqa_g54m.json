@@ -1,0 +1,62 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.4-mini/optimizer=azure:gpt-5.5",
+  "gate": "off",
+  "gate_metric": "hard",
+  "n_improved": 0,
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "split": {
+        "train": 10,
+        "val": 200,
+        "test": 1400
+      },
+      "dream_train": 5,
+      "test_before": 0.7679,
+      "test_after": 0.7571,
+      "delta": -0.0107,
+      "improved": false,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.7679,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.75,
+          "action": "greedy_improved",
+          "edits": [
+            "For context-retrieval or evidence-display tasks, output a Markdown block that begins exact",
+            "OVERRIDE: Do not output `<answer>...</answer>` unless the user explicitly requests XML ans",
+            "When copying titles, locations, or passages into a context block, preserve the exact wordi"
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.735,
+          "action": "greedy_regressed",
+          "edits": [
+            "OVERRIDE: For context-retrieval or evidence-display tasks, including prompts that say `qui",
+            "OVERRIDE: For context-retrieval or evidence-display tasks, never output `<answer>...</answ",
+            "When producing `[DOC] [TLE] <title> [PAR] <passage>`, copy the requested source passage ve"
+          ]
+        },
+        {
+          "night": 3,
+          "val_hard": 0.72,
+          "action": "greedy_regressed",
+          "edits": [
+            "- OVERRIDE: This supersedes the earlier rule about `quick one`: for context-retrieval or e",
+            "- For any question answered from a provided document, passage, title, search result, or Wi",
+            "- Final check for context-retrieval or evidence-display tasks: if the draft contains `<ans"
+          ]
+        }
+      ],
+      "tokens": 10341722,
+      "final_skill_tail": "it as a context-retrieval task: output the source context in `[DOC] [TLE] <title> [PAR] <passage>` format, not the extracted answer.\n- Final check for context-retrieval or evidence-display tasks: if the draft contains `<answer>` or `</answer>`, discard it and rewrite using only `## Context` or `(quick one) ## Context` plus `[DOC] [TLE] <title> [PAR] <passage>`.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

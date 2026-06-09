@@ -1,94 +1,79 @@
 # SkillOpt-Sleep — real-benchmark results (aligned to research blog_1)
 
-The deployment-time **Sleep** engine, run under the research blog's protocol:
-the intern's **exact data, splits, and evaluators**; same gate arms (C1 no-gate /
-C2 hard-gate); same optimizer/target pairing (gpt-5.5 optimizer; targets gpt-5.5
-/ gpt-5.4-mini / gpt-5.4-nano, Qwen excluded); **full** test sets. The **only**
-deviation: training simulates the online sleep+dream pipeline — 5 real "today's
-tasks" sampled from the train split + dream-augmented variants — instead of the
-full research train split.
+The deployment-time **Sleep** engine, run under the research blog's protocol: the intern's **exact data, splits, and evaluators**; same gate arms (C1 no-gate / C2 hard-gate); same optimizer/target pairing (gpt-5.5 optimizer; targets gpt-5.5 / gpt-5.4-mini / gpt-5.4-nano, Qwen excluded); **full** test sets. The **only** deviation: training simulates the online sleep+dream pipeline — 5 real "today's tasks" + dream-augmented variants — instead of the full research train split.
 
-Correctness is scored by the research evaluators, NOT toy format rules:
-searchqa = SQuAD exact-match vs gold; livemath = multiple-choice label;
-spreadsheet = official openpyxl cell-value compare after executing the agent's
-generated code. So baselines reflect the model's **real** unaided accuracy.
+Correctness is scored by the research evaluators (not toy format rules): searchqa = SQuAD em vs gold; livemath = multiple-choice label after the per-item choice shuffle; spreadsheet = official cell-value compare after executing the agent's generated openpyxl code. Baselines therefore reflect the model's **real** unaided accuracy and match the intern's range.
 
-Raw per-run JSON: `docs/sleep/blog_runs/real/`.
+Raw per-run JSON: `docs/sleep/blog_runs/real/`. Generated deterministically by `skillopt_sleep/experiments/gen_blog.py`.
 
-## Headline: SearchQA (the clean, trustworthy result)
+## What this corrects
 
-Full 1400-item held-out test, SQuAD em.
+An earlier version of this writeup used a harness with four scoring bugs that made the numbers non-comparable to the research blog. All four are fixed (commit `fix(sleep): align real-benchmark harness to research repo`):
 
-| arm | target | baseline | after | Δ |
-|---|---|---|---|---|
-| C1 no-gate | gpt-5.5 | 0.3571 | **0.7914** | **+0.4343** |
-| C2 hard-gate | gpt-5.5 | 0.3621 | **0.7586** | **+0.3964** |
-| C1 no-gate | gpt-5.4-mini | 0.3436 | **0.5557** | **+0.2121** |
-| C2 hard-gate | gpt-5.4-mini | 0.3457 | **0.7150** | **+0.3693** |
-| C1 no-gate | gpt-5.4-nano | 0.1993 | 0.2293 | +0.0300 |
-| C2 hard-gate | gpt-5.4-nano | 0.1864 | **0.3257** | **+0.1393** |
+1. **Backend swallowed filtered/transient errors → silent 0s.** The Azure call wrapped everything in `except: return ""`, so 429s/timeouts and — critically — content-filter 400s became empty responses that scored 0. Now retries with backoff.
+2. **The rollout wrapper tripped the content filter as a "jailbreak."** Phrasing like *"apply EXACTLY / HARD CONSTRAINTS that OVERRIDE / even at the cost of"* was flagged (HTTP 400) on ~½ of SearchQA items, which (with bug 1) zeroed them and dragged the baseline 0.79→0.42. Tasks now carry the research repo's neutral `rollout_system` verbatim.
+3. **SpreadsheetBench omitted the no-formula rule.** openpyxl never computes formulas, so a model writing `=A1*B1` had the cell read back as `None` and scored 0 despite correct logic. The prompt now carries the intern's critical rule (compute in Python, write literal values), lifting the gpt-5.5 baseline from ~0.20 to a real ~0.6+.
+4. **LiveMath skipped the per-item choice shuffle.** The raw data stores the correct option first (always label A), so "always answer A" scored ~1.0. Ported the research dataloader's deterministic shuffle; the gold distribution is now uniform A–E and the baseline is a real ~0.5–0.6.
 
-Genuine, large lifts from a **non-zero** baseline. The optimizer learned real QA
-strategy (e.g. *"never return an empty response; for any retrieval request output
-the best-supported span from the context"*), not a format trick. val tracks test
-(no overfitting). Note C2 (hard-gate) beats C1 on the two weaker targets
-(mini +0.37 vs +0.21; nano +0.14 vs +0.03) — the gate's payoff is clearest where
-the optimizer most needs protection from bad edits.
+All 96 unit tests pass; SearchQA baseline is back to 0.79 with zero empty responses.
 
-## SpreadsheetBench (honest: hard, mostly flat)
+## SearchQA
 
-Full 280-item test, real xlsx execution + official cell-value compare.
+Full 1400-item held-out test, SQuAD exact-match (em).
 
 | arm | target | baseline | after | Δ |
 |---|---|---|---|---|
-| C1 no-gate | gpt-5.5 | 0.2607 | 0.1607 | −0.1000 |
-| C2 hard-gate | gpt-5.5 | 0.2750 | 0.2750 | +0.0000 |
-| C1 no-gate | gpt-5.4-mini | 0.1964 | 0.1750 | −0.0214 |
-| C2 hard-gate | gpt-5.4-mini | 0.2071 | 0.2071 | +0.0000 |
-| C1 no-gate | gpt-5.4-nano | 0.2250 | 0.1179 | −0.1071 |
-| C2 hard-gate | gpt-5.4-nano | 0.2357 | 0.2357 | +0.0000 |
+| C1 no-gate | gpt-5.5 | 0.7957 | **0.8107** | **+0.0150** |
+| C1 no-gate | gpt-5.4-mini | 0.7679 | 0.7571 | -0.0107 |
+| C1 no-gate | gpt-5.4-nano | 0.5579 | **0.5850** | **+0.0271** |
+| C2 hard-gate | gpt-5.5 | 0.7929 | **0.8100** | **+0.0171** |
+| C2 hard-gate | gpt-5.4-mini | 0.7693 | 0.7664 | -0.0029 |
+| C2 hard-gate | gpt-5.4-nano | 0.5543 | **0.6021** | **+0.0479** |
 
-**The gate earns its keep here, in the clearest possible way.** Under C2 (hard
-gate) every proposed edit failed the validation check, so the skill stayed empty
-and the score is **unchanged** — no harm done. Under C1 (no gate), the same
-greedy edits were force-accepted and **hurt** every target (−0.02 to −0.11):
-code-writing "advice" that didn't generalize made the agent worse. This is the
-ablation's whole point: on a hard task where the optimizer can't find a helpful
-rule, the gate prevents regression; turning it off causes real damage.
+_4/6 arms improved; Δ range [-0.0107, +0.0479]; mean Δ C1 +0.0105 vs C2 +0.0207. Noise floor (same-model C1/C2 baseline spread): ±0.0036 — Δ below this is not meaningful._
 
-## LiveMath — EXCLUDED from claims (degenerate label distribution)
+## LiveMathematicianBench
 
-We ran it, but the LiveMath split is unusable as a capability measure and we
-report that plainly: **the correct answer is `A` for all 18 val and all 124 test
-items.** So a skill that always outputs `<answer>A</answer>` scores ~1.0 by
-construction — and indeed the optimizer discovered exactly that (final skill:
-*"HARD OVERRIDE … the final answer must be exactly `<answer>A</answer>`"*). The
-0.89–1.00 "after" numbers are an artifact of the all-A label distribution, not
-math ability, so **we exclude LiveMath from any improvement claim.** (This is
-itself a useful finding about benchmark hygiene, and a vivid example of why an
-independent, distribution-balanced held-out set matters — exactly the kind of
-"report the bad numbers" honesty the research blog practices.)
+Full 124-item held-out test, multiple-choice label correctness (choices shuffled per item, uniform A-E gold).
+
+| arm | target | baseline | after | Δ |
+|---|---|---|---|---|
+| C1 no-gate | gpt-5.5 | 0.5565 | 0.5161 | -0.0403 |
+| C1 no-gate | gpt-5.4-mini | 0.2823 | 0.2419 | -0.0403 |
+| C1 no-gate | gpt-5.4-nano | 0.1935 | **0.2177** | **+0.0242** |
+| C2 hard-gate | gpt-5.5 | 0.5645 | 0.4758 | -0.0887 |
+| C2 hard-gate | gpt-5.4-mini | 0.2258 | 0.2258 | +0.0000 |
+| C2 hard-gate | gpt-5.4-nano | 0.2661 | 0.2661 | +0.0000 |
+
+_1/6 arms improved; Δ range [-0.0887, +0.0242]; mean Δ C1 -0.0188 vs C2 -0.0296. Noise floor (same-model C1/C2 baseline spread): ±0.0726 — Δ below this is not meaningful._
+
+## SpreadsheetBench
+
+Full 280-item held-out test, real openpyxl code execution + official cell-value compare vs golden.xlsx.
+
+| arm | target | baseline | after | Δ |
+|---|---|---|---|---|
+| C1 no-gate | gpt-5.5 | 0.6250 | 0.6107 | -0.0143 |
+| C1 no-gate | gpt-5.4-mini | 0.3607 | 0.2714 | -0.0893 |
+| C1 no-gate | gpt-5.4-nano | 0.2893 | 0.2393 | -0.0500 |
+| C2 hard-gate | gpt-5.5 | 0.6393 | 0.6393 | +0.0000 |
+| C2 hard-gate | gpt-5.4-mini | 0.3286 | **0.3500** | **+0.0214** |
+| C2 hard-gate | gpt-5.4-nano | 0.2893 | 0.2893 | +0.0000 |
+
+_1/6 arms improved; Δ range [-0.0893, +0.0214]; mean Δ C1 -0.0512 vs C2 +0.0071. Noise floor (same-model C1/C2 baseline spread): ±0.0321 — Δ below this is not meaningful._
 
 ## Takeaways
 
-1. **SearchQA: the sleep cycle delivers real, large held-out gains** (+0.21 to
-   +0.43 em on 1400 items) from few real tasks + dreaming, with the optimizer
-   learning genuine procedural QA rules.
-2. **The validation gate is doing exactly its job**: it converts SpreadsheetBench
-   from a regression (C1: −0.10) into a safe no-op (C2: 0.00), and it sharpens the
-   gain on weaker SearchQA targets.
-3. **Honesty:** LiveMath's split is all-`A` and is excluded; SpreadsheetBench is
-   genuinely hard and shows no gain — we report both rather than cherry-pick.
+1. **Baselines now match the research repo, so the comparison is honest.** SearchQA gpt-5.5 baseline ≈ 0.80 (intern ≈ 0.79), LiveMath gpt-5.5 ≈ 0.56 (intern ≈ 0.52–0.59), SpreadsheetBench gpt-5.5 ≈ 0.62 (intern ≈ 0.41–0.62). The earlier writeup's huge "+0.43" lifts were almost entirely recovery from content-filter zeros, not learning — they are gone.
+2. **Real sleep gains are modest, by design.** We train on only **5 real tasks/night + dreaming** (deployment scale), versus the intern's full 400-item train set + multi-step optimization. So SearchQA improves by a few points at most (best Δ +0.0479), and gains below the per-benchmark noise floor are reported as noise rather than dressed up.
+3. **The validation gate's value scales with how reliable the val signal is — and we can see exactly where it helps and where it doesn't.** On **SpreadsheetBench** (40-item val) the gate is a clean win: C1 (no gate) regresses every target (Δ -0.0893 on mini), while C2 (gate) holds flat or improves on all 3 (3/3 targets C2 ≥ C1) — it rejects the self-sabotaging "write Excel formulas" edits the greedy arm accepts. On **LiveMath** (only 18-item val) the gate is unreliable (1/3 targets C2 ≥ C1): on gpt-5.5 it actually does worse than no gate, because an edit that helps 18 val items can hurt the 124-item test. The honest rule: trust the gate when the held-out val set is big enough to be a faithful proxy.
+4. **Honesty by construction.** Four harness bugs were found and fixed (above); the numbers here are regenerated deterministically from the committed run JSONs via `gen_blog.py`, and small Δ's are explicitly flagged against a measured noise floor.
 
 ## Reproduce
 
 ```bash
 PY=/home/azureuser/workspace-gzy/miniconda3/envs/reflact/bin/python  # openai + azure-identity
-SKILLOPT_SLEEP_WORKERS=16 $PY -m skillopt_sleep.experiments.run_blog_matrix \
+SKILLOPT_SLEEP_WORKERS=16 PYTHONPATH=. $PY -m skillopt_sleep.experiments.run_blog_matrix \
   --max-conc 3 --nights 3 --n-train 5 --dream-factor 1
-# single cell, e.g. searchqa C2 on gpt-5.4-mini:
-$PY -m skillopt_sleep.experiments.run_realbench \
-  --optimizer-backend azure --optimizer-model gpt-5.5 \
-  --target-backend azure --target-model gpt-5.4-mini \
-  --benchmarks searchqa --gate on --gate-metric hard --json
+PYTHONPATH=. $PY skillopt_sleep/experiments/gen_blog.py   # regenerate this file
 ```

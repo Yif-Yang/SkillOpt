@@ -1,0 +1,55 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.5/optimizer=azure:gpt-5.5",
+  "gate": "on",
+  "gate_metric": "hard",
+  "n_improved": 0,
+  "results": [
+    {
+      "benchmark": "livemath",
+      "split": {
+        "train": 10,
+        "val": 18,
+        "test": 124
+      },
+      "dream_train": 5,
+      "test_before": 0.5645,
+      "test_after": 0.4758,
+      "delta": -0.0887,
+      "improved": false,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.5645,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.4444,
+          "action": "accept_new_best",
+          "edits": [
+            "For every multiple-choice math question, solve the mathematical claim first and only then ",
+            "Before finalizing an A/B/C/D answer, explicitly compare the derived result against all fou",
+            "For theorem-recognition questions, do not answer from memory of the theorem name alone; ve",
+            "In quick-answer mode, keep the final output in the requested format but still perform the "
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.4444,
+          "action": "reject",
+          "edits": []
+        },
+        {
+          "night": 3,
+          "val_hard": 0.4444,
+          "action": "reject",
+          "edits": []
+        }
+      ],
+      "tokens": 2490024,
+      "final_skill_tail": "tions, do not answer from memory of the theorem name alone; verify the exact hypotheses, constants, ranges, and conclusions stated in the prompt before selecting the option.\n- In quick-answer mode, keep the final output in the requested format but still perform the full internal check: derive result, test options A/B/C/D, then output the single selected answer.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.5/optimizer=azure:gpt-5.5",
+  "gate": "off",
+  "gate_metric": "hard",
+  "n_improved": 0,
+  "results": [
+    {
+      "benchmark": "livemath",
+      "split": {
+        "train": 10,
+        "val": 18,
+        "test": 124
+      },
+      "dream_train": 5,
+      "test_before": 0.5565,
+      "test_after": 0.5161,
+      "delta": -0.0403,
+      "improved": false,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.5565,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.4444,
+          "action": "greedy_improved",
+          "edits": [
+            "For multiple-choice math questions, solve the problem from definitions/theorems before cho",
+            "Before finalizing an A/B/C/D/E answer, compare every provided option against the derived r",
+            "When a problem has integer, parameter, or limiting hypotheses, test the candidate answer o",
+            "If the prompt requests only the final multiple-choice answer, output exactly one tag in th"
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.2778,
+          "action": "greedy_regressed",
+          "edits": [
+            "OVERRIDE: If the prompt says \"quick one\" or requests only the final answer, still perform ",
+            "For theorem-statement multiple-choice questions, first identify the precise theorem being ",
+            "For algebraic or combinatorial classification questions, compute canonical invariants expl",
+            "For PDE, asymptotic, or concentration-compactness multiple-choice questions, verify the sc"
+          ]
+        },
+        {
+          "night": 3,
+          "val_hard": 0.5,
+          "action": "greedy_improved",
+          "edits": [
+            "OVERRIDE: For any final-only multiple-choice task, do not output a letter from a heuristic",
+            "For abelianization questions from group presentations, build the full integer relator matr",
+            "For shifted k-uniform hypergraph questions, translate shiftedness into the componentwise d",
+            "For theorem-recognition questions with explicit parameter ranges or PDE blow-up/concentrat"
+          ]
+        }
+      ],
+      "tokens": 2754353,
+      "final_skill_tail": "recognition questions with explicit parameter ranges or PDE blow-up/concentration statements, copy the exact inequalities, coefficients, signs, normalizations, and quantifiers into the hidden check, then reject any option that changes one of them; in particular, strict endpoints such as 2/15+ε<θ<1−δ0 and equation signs such as −Δv_n=... must be matched exactly.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

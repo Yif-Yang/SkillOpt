@@ -1,0 +1,55 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.4-nano/optimizer=azure:gpt-5.5",
+  "gate": "on",
+  "gate_metric": "hard",
+  "n_improved": 1,
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "split": {
+        "train": 10,
+        "val": 200,
+        "test": 1400
+      },
+      "dream_train": 5,
+      "test_before": 0.5543,
+      "test_after": 0.6021,
+      "delta": 0.0479,
+      "improved": true,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.5543,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.52,
+          "action": "reject",
+          "edits": []
+        },
+        {
+          "night": 2,
+          "val_hard": 0.575,
+          "action": "accept_new_best",
+          "edits": [
+            "When the required output is evidence/context, start the response exactly with `## Context`",
+            "Do not wrap outputs in `<answer>` or `</answer>` tags unless the user explicitly requests ",
+            "For extractive answers, output only the exact answer span with no trailing period, no pare",
+            "Preserve the full canonical name exactly as shown in the source title or passage, includin"
+          ]
+        },
+        {
+          "night": 3,
+          "val_hard": 0.575,
+          "action": "reject",
+          "edits": []
+        }
+      ],
+      "tokens": 9205431,
+      "final_skill_tail": "user explicitly requests XML/HTML tags.\n- For extractive answers, output only the exact answer span with no trailing period, no parenthetical, no dash explanation, and no extra description.\n- Preserve the full canonical name exactly as shown in the source title or passage, including hyphenated place names and qualifiers such as `Lutherville-Timonium, Maryland`.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

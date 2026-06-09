@@ -1,0 +1,65 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.4-nano/optimizer=azure:gpt-5.5",
+  "gate": "off",
+  "gate_metric": "hard",
+  "n_improved": 1,
+  "results": [
+    {
+      "benchmark": "livemath",
+      "split": {
+        "train": 10,
+        "val": 18,
+        "test": 124
+      },
+      "dream_train": 5,
+      "test_before": 0.1935,
+      "test_after": 0.2177,
+      "delta": 0.0242,
+      "improved": true,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.1935,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.3889,
+          "action": "greedy_flat",
+          "edits": [
+            "For multiple-choice questions, final output must be exactly one XML tag in the form `<answ",
+            "Treat prompts labeled `quick one` as requiring the same full accuracy as normal prompts: s",
+            "For advanced math theorem-recognition MC, match the option to the exact hypotheses and con",
+            "When a problem asks for algebraic/combinatorial classification, do the defining test direc"
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.2778,
+          "action": "greedy_regressed",
+          "edits": [
+            "For number-theory theorem-recognition MC with the fingerprint `2/15+\\varepsilon<\\theta<1-\\",
+            "For shifted `k\\in\\{2,3\\}` uniform hypergraph MC, OVERRIDE any instinct that shifted implie",
+            "For `H(n,m)^{\\mathrm{ab}}` questions, build the abelianization from the exponent-sum integ",
+            "For elliptic/PDE theorem MC, preserve exact exceptional constants: with `1<p<\\frac{2^*}{2}"
+          ]
+        },
+        {
+          "night": 3,
+          "val_hard": 0.2222,
+          "action": "greedy_regressed",
+          "edits": [
+            "OVERRIDE for number-theory MC with fingerprint `2/15+\\varepsilon<\\theta<1-\\delta_0` and `h",
+            "OVERRIDE for shifted `k\\in\\{2,3\\}` uniform hypergraph MC: never infer matroid from shifted",
+            "OVERRIDE for cyclically presented `H(n,m)^{\\mathrm{ab}}` with `0\\le m<n` and abelian relat",
+            "OVERRIDE for elliptic/PDE theorem MC: keep the two fingerprints separate. If the hypothese"
+          ]
+        }
+      ],
+      "tokens": 904251,
+      "final_skill_tail": "ical and choose the existence/multiplicity statement with exactly those ranges, rejecting uniqueness/nonexistence or altered exponent ranges. If the equation is `-\\Delta v_n=(\\varepsilon_n^2+|x|^2)e^{v_n}` in `\\mathbb R^2`, select statements allowing local blow-up mass `12\\pi`, and reject options limiting masses to only `8\\pi`, only `16\\pi`, or `8\\pi\\mathbb N`.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

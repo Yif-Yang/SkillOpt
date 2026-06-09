@@ -54,3 +54,6 @@ docs/render_ablation_paper_tables.py
 docs/让*
 .gradio/
 .venv
+
+# matrix run stderr sidecars (openpyxl warnings only)
+docs/sleep/blog_runs/real/*.err

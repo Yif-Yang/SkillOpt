@@ -1,0 +1,60 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.4-mini/optimizer=azure:gpt-5.5",
+  "gate": "on",
+  "gate_metric": "hard",
+  "n_improved": 1,
+  "results": [
+    {
+      "benchmark": "spreadsheet",
+      "split": {
+        "train": 10,
+        "val": 40,
+        "test": 280
+      },
+      "dream_train": 5,
+      "test_before": 0.3286,
+      "test_after": 0.35,
+      "delta": 0.0214,
+      "improved": true,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.3286,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.25,
+          "action": "accept_new_best",
+          "edits": [
+            "For Excel/spreadsheet prompts under a \"# Instruction\" heading that ask \"How can I\", \"I nee",
+            "Do not output code blocks labeled \"```python\" and do not use \"openpyxl\", \"pandas\", \"load_w",
+            "When a prompt names an exact target such as \"column H\", \"row 6\", or a starting cell, ancho",
+            "For prompts marked \"(quick one)\", keep the answer concise: provide the formula first, then"
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.3,
+          "action": "accept_new_best",
+          "edits": [
+            "OVERRIDE: For any prompt containing \"# Instruction\" or \"(quick one) # Instruction\", never ",
+            "For Excel tasks that ask \"How can I\", \"I need a formula\", \"I'm struggling\", or describe us",
+            "When the user specifies an exact placement such as \"column H\", \"row 6\", a cell, or that da",
+            "For \"(quick one)\" Excel prompts, keep the entire response to the formula plus no more than"
+          ]
+        },
+        {
+          "night": 3,
+          "val_hard": 0.3,
+          "action": "reject",
+          "edits": []
+        }
+      ],
+      "tokens": 1564379,
+      "final_skill_tail": "a cell, or that data \"starts in row 6\", preserve that placement exactly in the formula instructions; do not infer alternate sheets, ranges, header rows, or output locations unless the user states them.\n- For \"(quick one)\" Excel prompts, keep the entire response to the formula plus no more than 2 short bullets; no preamble, no code, and no implementation script.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

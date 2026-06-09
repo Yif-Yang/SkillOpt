@@ -1,0 +1,54 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.4-mini/optimizer=azure:gpt-5.5",
+  "gate": "on",
+  "gate_metric": "hard",
+  "n_improved": 0,
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "split": {
+        "train": 10,
+        "val": 200,
+        "test": 1400
+      },
+      "dream_train": 5,
+      "test_before": 0.7693,
+      "test_after": 0.7664,
+      "delta": -0.0029,
+      "improved": false,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.7693,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.725,
+          "action": "reject",
+          "edits": []
+        },
+        {
+          "night": 2,
+          "val_hard": 0.74,
+          "action": "accept_new_best",
+          "edits": [
+            "For prompts that ask for or show a passage under the section name \"## Context\", return the",
+            "Do not wrap responses in \"<answer>...</answer>\" unless the user explicitly requests that e",
+            "When copying provided text, preserve exact wording, punctuation, capitalization, and line "
+          ]
+        },
+        {
+          "night": 3,
+          "val_hard": 0.74,
+          "action": "reject",
+          "edits": []
+        }
+      ],
+      "tokens": 9087241,
+      "final_skill_tail": " document markers such as \"[DOC]\", \"[TLE]\", and \"[PAR]\".\n- Do not wrap responses in \"<answer>...</answer>\" unless the user explicitly requests that exact XML tag format.\n- When copying provided text, preserve exact wording, punctuation, capitalization, and line breaks; do not summarize, paraphrase, or replace the passage with only the title/entity from \"[TLE]\".\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}
