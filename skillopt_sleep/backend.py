@@ -287,14 +287,29 @@ class CliBackend(Backend):
 
     # operations -----------------------------------------------------------
     def attempt(self, task: TaskRecord, skill: str, memory: str) -> str:
+        if task.system:
+            # Benchmark carries its own (research-repo) rollout system prompt.
+            # Use it verbatim with a neutral skill/memory section — this both
+            # keeps scoring faithful and avoids the aggressive "OVERRIDE / HARD
+            # CONSTRAINT" phrasing below, which Azure's content filter flags as a
+            # jailbreak (HTTP 400) and silently zeroes the rollout.
+            skill_section = f"## Skill\n{skill.strip()}\n\n" if skill.strip() else ""
+            mem_section = f"## Memory\n{memory.strip()}\n\n" if memory.strip() else ""
+            system = task.system.replace("{skill_section}", skill_section)
+            if "{skill_section}" not in task.system and skill_section:
+                system = skill_section + system
+            body = task.intent + ("\n\n" + task.context_excerpt if task.context_excerpt else "")
+            prompt = f"{system}{mem_section}\n{body}"
+            key = "attempt:" + skill_hash(prompt)
+            return self._cached_call(key, prompt, max_tokens=512)
+        # generic path (mined daily-case tasks): neutral, content-filter-safe
+        # wording. Apply the skill/memory as guidance, not as adversarial
+        # "OVERRIDE everything" directives.
         prompt = (
-            "You are completing a recurring task for a user. Apply the skill and "
-            "memory rules EXACTLY, including any output-format requirements. If the "
-            "skill contains a 'Learned preferences' block, treat those rules as "
-            "HARD CONSTRAINTS that OVERRIDE anything earlier in the skill they "
-            "conflict with (e.g. an explicit length limit overrides 'be "
-            "exhaustive'). Satisfy every such constraint even at the cost of "
-            "brevity or detail.\n\n"
+            "Complete the following task for the user. Follow the skill and memory "
+            "guidance below, including any output-format and length requirements. "
+            "When a 'Learned preferences' rule sets an explicit limit (e.g. a length "
+            "cap), prefer that rule over more general advice it refines.\n\n"
             f"# Skill\n{skill or '(none)'}\n\n# Memory\n{memory or '(none)'}\n\n"
             f"# Task\n{task.intent}\n\n{task.context_excerpt}\n\n"
             "Return ONLY the final answer text, nothing else."
@@ -801,23 +816,45 @@ class AzureOpenAIBackend(CliBackend):
             )
         return self._client
 
-    def _call(self, prompt: str, *, max_tokens: int = 1024) -> str:
-        try:
-            client = self._get_client()
-            resp = client.chat.completions.create(
-                model=self.deployment,
-                messages=[{"role": "user", "content": prompt}],
-                max_completion_tokens=16384,
-            )
-            text = (resp.choices[0].message.content or "").strip()
+    def _call(self, prompt: str, *, max_tokens: int = 1024, retries: int = 5) -> str:
+        """Call the deployment with bounded retries.
+
+        IMPORTANT: transient failures (429 rate-limit, timeouts, 5xx) must NOT be
+        silently turned into an empty string — an empty response scores 0 and
+        deflates every baseline/after measure. We retry with exponential backoff
+        (mirroring the research repo's retries=5) and only return "" after the
+        budget is exhausted. ``time``/``random`` are used for backoff; both are
+        available here (this is library code, not a Workflow script sandbox).
+        """
+        import random as _r
+        import time as _t
+
+        client = self._get_client()
+        last_exc = None
+        for attempt in range(max(1, retries)):
             try:
-                u = resp.usage
-                self._tokens += (getattr(u, "prompt_tokens", 0) or 0) + (getattr(u, "completion_tokens", 0) or 0)
-            except Exception:
-                pass
-            return text
-        except Exception:
-            return ""
+                resp = client.chat.completions.create(
+                    model=self.deployment,
+                    messages=[{"role": "user", "content": prompt}],
+                    max_completion_tokens=16384,
+                )
+                text = (resp.choices[0].message.content or "").strip()
+                try:
+                    u = resp.usage
+                    self._tokens += (getattr(u, "prompt_tokens", 0) or 0) + (getattr(u, "completion_tokens", 0) or 0)
+                except Exception:
+                    pass
+                if text:
+                    return text
+                # empty but no exception: model genuinely returned nothing — one
+                # quick retry can help (reasoning models occasionally yield empty)
+                last_exc = "empty-response"
+            except Exception as e:  # noqa: BLE001
+                last_exc = e
+            # backoff before next try (skip after the final attempt)
+            if attempt < retries - 1:
+                _t.sleep(min(8.0, (2 ** attempt) * 0.5) + _r.random() * 0.4)
+        return ""
 
 
 def get_backend(

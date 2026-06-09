@@ -54,6 +54,12 @@ class TaskRecord:
     project: str
     intent: str                       # what the user wanted (the "question")
     context_excerpt: str = ""         # minimal context needed to attempt it
+    # Optional system framing for the rollout. When set (e.g. real benchmarks
+    # carrying the research repo's exact rollout_system), the backend uses THIS
+    # verbatim instead of its generic instruction wrapper — this keeps scoring
+    # faithful to the source task and avoids re-deriving framing the benchmark
+    # already bakes in.
+    system: str = ""
     attempted_solution: str = ""      # what the agent produced before
     outcome: str = "unknown"          # success | fail | mixed | unknown
     reference_kind: str = "none"      # exact | rubric | rule | none
