@@ -1,0 +1,50 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.4-mini/optimizer=azure:gpt-5.5",
+  "gate": "on",
+  "gate_metric": "hard",
+  "n_improved": 0,
+  "results": [
+    {
+      "benchmark": "spreadsheet",
+      "split": {
+        "train": 10,
+        "val": 40,
+        "test": 280
+      },
+      "dream_train": 5,
+      "test_before": 0.2071,
+      "test_after": 0.2071,
+      "delta": 0.0,
+      "improved": false,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.2071,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.2,
+          "action": "reject",
+          "edits": []
+        },
+        {
+          "night": 2,
+          "val_hard": 0.2,
+          "action": "reject",
+          "edits": []
+        },
+        {
+          "night": 3,
+          "val_hard": 0.2,
+          "action": "reject",
+          "edits": []
+        }
+      ],
+      "tokens": 646402,
+      "final_skill_tail": ""
+    }
+  ]
+}

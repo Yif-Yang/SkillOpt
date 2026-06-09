@@ -1,0 +1,55 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.4-nano/optimizer=azure:gpt-5.5",
+  "gate": "on",
+  "gate_metric": "hard",
+  "n_improved": 1,
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "split": {
+        "train": 10,
+        "val": 200,
+        "test": 1400
+      },
+      "dream_train": 5,
+      "test_before": 0.1864,
+      "test_after": 0.3257,
+      "delta": 0.1393,
+      "improved": true,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.1864,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.275,
+          "action": "accept_new_best",
+          "edits": [
+            "For context-retrieval or passage-display prompts, never return an empty response; always o",
+            "Use this exact context format when providing retrieved/document context: start with '## Co",
+            "If the prompt includes a short prefix such as '(quick one)', preserve it before the contex",
+            "When the requested source is a Wikipedia-style title, include the title verbatim in '[TLE]"
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.275,
+          "action": "reject",
+          "edits": []
+        },
+        {
+          "night": 3,
+          "val_hard": 0.275,
+          "action": "reject",
+          "edits": []
+        }
+      ],
+      "tokens": 8383553,
+      "final_skill_tail": ", then '[DOC] [TLE] <title> [PAR] <passage>'.\n- If the prompt includes a short prefix such as '(quick one)', preserve it before the context block, e.g. '(quick one) ## Context'.\n- When the requested source is a Wikipedia-style title, include the title verbatim in '[TLE] <title> - Wikipedia' and provide the opening encyclopedic sentence or passage after '[PAR]'.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

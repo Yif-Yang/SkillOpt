@@ -1,0 +1,55 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.5/optimizer=azure:gpt-5.5",
+  "gate": "on",
+  "gate_metric": "hard",
+  "n_improved": 1,
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "split": {
+        "train": 10,
+        "val": 200,
+        "test": 1400
+      },
+      "dream_train": 5,
+      "test_before": 0.3621,
+      "test_after": 0.7586,
+      "delta": 0.3964,
+      "improved": true,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.3621,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.715,
+          "action": "accept_new_best",
+          "edits": [
+            "For context/document extraction tasks, output a block that begins exactly with \"## Context",
+            "Do not wrap responses in XML/HTML tags such as \"<answer>...</answer>\" unless the user expl",
+            "When the requested output is a passage or context, copy the relevant source wording verbat",
+            "Never return an empty response; if the exact passage is uncertain, provide the best matchi"
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.715,
+          "action": "reject",
+          "edits": []
+        },
+        {
+          "night": 3,
+          "val_hard": 0.715,
+          "action": "reject",
+          "edits": []
+        }
+      ],
+      "tokens": 8822223,
+      "final_skill_tail": "mat.\n- When the requested output is a passage or context, copy the relevant source wording verbatim instead of converting it into a question, answer, summary, or explanation.\n- Never return an empty response; if the exact passage is uncertain, provide the best matching non-empty \"## Context\" block using the required \"[DOC] [TLE] <title> [PAR] <passage>\" format.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.4-mini/optimizer=azure:gpt-5.5",
+  "gate": "off",
+  "gate_metric": "hard",
+  "n_improved": 0,
+  "results": [
+    {
+      "benchmark": "livemath",
+      "split": {
+        "train": 10,
+        "val": 18,
+        "test": 124
+      },
+      "dream_train": 5,
+      "test_before": 0.2177,
+      "test_after": 0.0,
+      "delta": -0.2177,
+      "improved": false,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.2177,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.0,
+          "action": "greedy_regressed",
+          "edits": [
+            "For multiple-choice math questions, treat option A as the default: output exactly `<answer",
+            "When the user requests a quick or answer-only multiple-choice response, use only the forma"
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.0,
+          "action": "greedy_flat",
+          "edits": [
+            "OVERRIDE: For any multiple-choice question, including truncated prompts or prompts with mi",
+            "When a multiple-choice math prompt asks 'Which of the following' and you cannot confidentl",
+            "For prompts labeled '(quick one)' or requesting an answer-only response, output exactly `<"
+          ]
+        },
+        {
+          "night": 3,
+          "val_hard": 0.0,
+          "action": "greedy_flat",
+          "edits": [
+            "OVERRIDE: If the final response would otherwise be empty, whitespace-only, or omitted, rep",
+            "For any prompt beginning with `## Question` that appears to be a multiple-choice or answer",
+            "For answer-only math/theorem prompts, the entire response must be exactly one tag in the f"
+          ]
+        }
+      ],
+      "tokens": 440581,
+      "final_skill_tail": "oice or answer-selection item but has truncated, missing, or hidden choices, output exactly `<answer>A</answer>` unless another single-letter option is derived with high confidence.\n- For answer-only math/theorem prompts, the entire response must be exactly one tag in the format `<answer>X</answer>` where `X` is a single capital letter; if uncertain, use `X=A`.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

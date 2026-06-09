@@ -1,0 +1,65 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.4-mini/optimizer=azure:gpt-5.5",
+  "gate": "off",
+  "gate_metric": "hard",
+  "n_improved": 0,
+  "results": [
+    {
+      "benchmark": "spreadsheet",
+      "split": {
+        "train": 10,
+        "val": 40,
+        "test": 280
+      },
+      "dream_train": 5,
+      "test_before": 0.1964,
+      "test_after": 0.175,
+      "delta": -0.0214,
+      "improved": false,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.1964,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.175,
+          "action": "greedy_flat",
+          "edits": [
+            "For every '## Spreadsheet task (write Python code)', first inspect the workbook structure ",
+            "Never rely on 'wb.active', hard-coded ranges such as 'range(3, 7)', or fixed header rows s",
+            "When modifying a workbook, preserve all unrelated cells and write only to the requested ou",
+            "If a spreadsheet task asks for a formula, insert the formula into the exact requested targ"
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.15,
+          "action": "greedy_regressed",
+          "edits": [
+            "OVERRIDE for every '## Spreadsheet task (write Python code)': to avoid 'cell-mismatch', ne",
+            "For every '## Spreadsheet task (write Python code)', if a workbook contains a sheet named ",
+            "For formula-filling tasks, hard-code only coordinates explicitly stated in the prompt such",
+            "Before saving in a '## Spreadsheet task (write Python code)', include code-level checks th"
+          ]
+        },
+        {
+          "night": 3,
+          "val_hard": 0.075,
+          "action": "greedy_regressed",
+          "edits": [
+            "OVERRIDE for every '## Spreadsheet task (write Python code)': never select a worksheet by ",
+            "OVERRIDE the existing 'Output' preference: use a sheet named exactly 'Output', 'Answer', '",
+            "When the prompt names a target column such as 'column H' but does not name a target sheet,",
+            "For split/filter/transfer tasks involving two tables, detect both source and destination t"
+          ]
+        }
+      ],
+      "tokens": 1765869,
+      "final_skill_tail": "hen write formulas into that exact column on that same worksheet for the discovered data rows.\n- For split/filter/transfer tasks involving two tables, detect both source and destination tables by their header text and relative layout in the workbook; do not infer the destination from sheet names alone, and write only inside the detected destination table cells.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

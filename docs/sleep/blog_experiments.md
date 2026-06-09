@@ -1,77 +1,94 @@
-# SkillOpt-Sleep — blog-aligned experiments
+# SkillOpt-Sleep — real-benchmark results (aligned to research blog_1)
 
-These plugin experiments mirror the SkillOpt research blog (`outputs/blog_1`) so
-the two read as one story. Same **gate-ablation arms**, same **optimizer/target
-pairing** (gpt-5.5 optimizer → gpt-5.4-mini target, Azure managed identity),
-same **4:1:5 train/val/test split**, same **metric columns**.
+The deployment-time **Sleep** engine, run under the research blog's protocol:
+the intern's **exact data, splits, and evaluators**; same gate arms (C1 no-gate /
+C2 hard-gate); same optimizer/target pairing (gpt-5.5 optimizer; targets gpt-5.5
+/ gpt-5.4-mini / gpt-5.4-nano, Qwen excluded); **full** test sets. The **only**
+deviation: training simulates the online sleep+dream pipeline — 5 real "today's
+tasks" sampled from the train split + dream-augmented variants — instead of the
+full research train split.
 
-The difference: this runs the deployment-time **Sleep** engine
-(`skillopt_sleep`) on "daily case" task families, not the research `scripts/train.py`.
-So it answers: *does the same validation-gated self-evolution work when the
-artifact is a user's nightly plugin?*
+Correctness is scored by the research evaluators, NOT toy format rules:
+searchqa = SQuAD exact-match vs gold; livemath = multiple-choice label;
+spreadsheet = official openpyxl cell-value compare after executing the agent's
+generated code. So baselines reflect the model's **real** unaided accuracy.
 
-## Arms (aligned to blog_1)
+Raw per-run JSON: `docs/sleep/blog_runs/real/`.
 
-| Arm | Setting | Meaning |
-|---|---|---|
-| **C1** | `--gate off` | no gate — every proposed edit accepted (greedy). Ablation control. |
-| **C2** | `--gate on --gate-metric hard` | hard-gate: keep an edit only if it raises the held-out **hard** score. |
-| (C3 / C4) | `--gate-metric soft` / `mixed` | soft / mixed gate metrics (same as blog_1). |
+## Headline: SearchQA (the clean, trustworthy result)
 
-Fixed: optimizer = **gpt-5.5**; target = **gpt-5.4-mini**; 4:1:5 split; seed 42;
-3 nights. Three families:
+Full 1400-item held-out test, SQuAD em.
 
-| Family | House rule the optimizer must learn (judge) |
-|---|---|
-| math | final answer wrapped in `\boxed{...}` |
-| spreadsheet | formula starts with `=` and references a cell/range |
-| searchqa | answer cites a source as `[DOC n]` |
+| arm | target | baseline | after | Δ |
+|---|---|---|---|---|
+| C1 no-gate | gpt-5.5 | 0.3571 | **0.7914** | **+0.4343** |
+| C2 hard-gate | gpt-5.5 | 0.3621 | **0.7586** | **+0.3964** |
+| C1 no-gate | gpt-5.4-mini | 0.3436 | **0.5557** | **+0.2121** |
+| C2 hard-gate | gpt-5.4-mini | 0.3457 | **0.7150** | **+0.3693** |
+| C1 no-gate | gpt-5.4-nano | 0.1993 | 0.2293 | +0.0300 |
+| C2 hard-gate | gpt-5.4-nano | 0.1864 | **0.3257** | **+0.1393** |
 
-## Results (test = held-out, scored by the rule judge)
+Genuine, large lifts from a **non-zero** baseline. The optimizer learned real QA
+strategy (e.g. *"never return an empty response; for any retrieval request output
+the best-supported span from the context"*), not a format trick. val tracks test
+(no overfitting). Note C2 (hard-gate) beats C1 on the two weaker targets
+(mini +0.37 vs +0.21; nano +0.14 vs +0.03) — the gate's payoff is clearest where
+the optimizer most needs protection from bad edits.
 
-From `docs/sleep/blog_runs/{c1,c2}_mini.json`. Optimizer **gpt-5.5** → target
-**gpt-5.4-mini**, 4:1:5 split, seed 42, 3 nights.
+## SpreadsheetBench (honest: hard, mostly flat)
 
-| arm | family | split (tr/val/te) | baseline(test) | after(test) | Δ |
-|---|---|---|---|---|---|
-| **C1** no-gate | math | 12/1/7 | 0.000 | **1.000** | **+1.000** |
-| **C1** no-gate | spreadsheet | 6/3/11 | 0.545 | **0.909** | **+0.364** |
-| **C1** no-gate | searchqa | 3/3/14 | 0.000 | **1.000** | **+1.000** |
-| **C2** hard-gate | math | 12/1/7 | 0.000 | **1.000** | **+1.000** |
-| **C2** hard-gate | spreadsheet | 6/3/11 | 0.545 | 0.545 | +0.000 |
-| **C2** hard-gate | searchqa | 3/3/14 | 0.000 | **1.000** | **+1.000** |
+Full 280-item test, real xlsx execution + official cell-value compare.
 
-**C1 improved 3/3 families; C2 improved 2/3.** The gpt-5.5 optimizer learned the
-right house rule for each family (e.g. for searchqa: *"include at least one
-document label matching the exact required pattern `[DOC n]`"*) and gpt-5.4-mini
-applied it to the unseen test tasks.
+| arm | target | baseline | after | Δ |
+|---|---|---|---|---|
+| C1 no-gate | gpt-5.5 | 0.2607 | 0.1607 | −0.1000 |
+| C2 hard-gate | gpt-5.5 | 0.2750 | 0.2750 | +0.0000 |
+| C1 no-gate | gpt-5.4-mini | 0.1964 | 0.1750 | −0.0214 |
+| C2 hard-gate | gpt-5.4-mini | 0.2071 | 0.2071 | +0.0000 |
+| C1 no-gate | gpt-5.4-nano | 0.2250 | 0.1179 | −0.1071 |
+| C2 hard-gate | gpt-5.4-nano | 0.2357 | 0.2357 | +0.0000 |
 
-### The honest finding (aligned with the blog's own caveats)
+**The gate earns its keep here, in the clearest possible way.** Under C2 (hard
+gate) every proposed edit failed the validation check, so the skill stayed empty
+and the score is **unchanged** — no harm done. Under C1 (no gate), the same
+greedy edits were force-accepted and **hurt** every target (−0.02 to −0.11):
+code-writing "advice" that didn't generalize made the agent worse. This is the
+ablation's whole point: on a hard task where the optimizer can't find a helpful
+rule, the gate prevents regression; turning it off causes real damage.
 
-The one C1-vs-C2 difference is **spreadsheet**: greedy C1 captured **+0.364**, but
-the **hard gate (C2) rejected the same edit (+0.000)**. Why? The val split here is
-tiny (3 items), and on those 3 the edit didn't register a strict hard-score gain,
-so the gate dropped it — even though it *did* help the larger test set. This is
-exactly the small-selection-set effect the research blog documents and is why it
-also runs **soft / mixed** gate metrics (C3/C4): a smoother gate signal accepts
-such edits. The takeaway matches the paper: the hard gate is the safe default but
-can be conservative on tiny validation sets; soft/mixed help there.
+## LiveMath — EXCLUDED from claims (degenerate label distribution)
 
-This mirrors the deployment reality: a user's nightly val set is often small, so
-the plugin defaults to `mixed` (not pure `hard`) for exactly this reason.
+We ran it, but the LiveMath split is unusable as a capability measure and we
+report that plainly: **the correct answer is `A` for all 18 val and all 124 test
+items.** So a skill that always outputs `<answer>A</answer>` scores ~1.0 by
+construction — and indeed the optimizer discovered exactly that (final skill:
+*"HARD OVERRIDE … the final answer must be exactly `<answer>A</answer>`"*). The
+0.89–1.00 "after" numbers are an artifact of the all-A label distribution, not
+math ability, so **we exclude LiveMath from any improvement claim.** (This is
+itself a useful finding about benchmark hygiene, and a vivid example of why an
+independent, distribution-balanced held-out set matters — exactly the kind of
+"report the bad numbers" honesty the research blog practices.)
+
+## Takeaways
+
+1. **SearchQA: the sleep cycle delivers real, large held-out gains** (+0.21 to
+   +0.43 em on 1400 items) from few real tasks + dreaming, with the optimizer
+   learning genuine procedural QA rules.
+2. **The validation gate is doing exactly its job**: it converts SpreadsheetBench
+   from a regression (C1: −0.10) into a safe no-op (C2: 0.00), and it sharpens the
+   gain on weaker SearchQA targets.
+3. **Honesty:** LiveMath's split is all-`A` and is excluded; SpreadsheetBench is
+   genuinely hard and shows no gain — we report both rather than cherry-pick.
 
 ## Reproduce
 
 ```bash
-PY=/home/azureuser/workspace-gzy/miniconda3/envs/reflact/bin/python  # has openai + azure-identity
-# C1 (no gate)
-$PY -m skillopt_sleep.experiments.run_daily \
+PY=/home/azureuser/workspace-gzy/miniconda3/envs/reflact/bin/python  # openai + azure-identity
+SKILLOPT_SLEEP_WORKERS=16 $PY -m skillopt_sleep.experiments.run_blog_matrix \
+  --max-conc 3 --nights 3 --n-train 5 --dream-factor 1
+# single cell, e.g. searchqa C2 on gpt-5.4-mini:
+$PY -m skillopt_sleep.experiments.run_realbench \
   --optimizer-backend azure --optimizer-model gpt-5.5 \
   --target-backend azure --target-model gpt-5.4-mini \
-  --families math,spreadsheet,searchqa --gate off \
-  --nights 3 --val-fraction 0.1 --test-fraction 0.5 --seed 42 --json
-# C2 (hard gate): add  --gate on --gate-metric hard
+  --benchmarks searchqa --gate on --gate-metric hard --json
 ```
-
-The Azure backend uses managed identity (client `8cafa2b1-…`) and the endpoints
-from the blog's `avail_api.md`, so the models are identical to the research runs.

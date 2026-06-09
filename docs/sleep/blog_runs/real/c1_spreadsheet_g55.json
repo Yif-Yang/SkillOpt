@@ -1,0 +1,65 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.5/optimizer=azure:gpt-5.5",
+  "gate": "off",
+  "gate_metric": "hard",
+  "n_improved": 0,
+  "results": [
+    {
+      "benchmark": "spreadsheet",
+      "split": {
+        "train": 10,
+        "val": 40,
+        "test": 280
+      },
+      "dream_train": 5,
+      "test_before": 0.2607,
+      "test_after": 0.1607,
+      "delta": -0.1,
+      "improved": false,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.2607,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.15,
+          "action": "greedy_regressed",
+          "edits": [
+            "For any '## Spreadsheet task (write Python code)', dynamically identify the correct worksh",
+            "Before writing spreadsheet outputs, scan the used range and build normalized header/label ",
+            "Write only the cells requested by the spreadsheet instruction and preserve all other workb",
+            "When a spreadsheet instruction asks for a formula or calculation in a column/cell, place E"
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.175,
+          "action": "greedy_improved",
+          "edits": [
+            "OVERRIDE the prior `raise ValueError` rule: for spreadsheet tasks, the generated script mu",
+            "For any `## Spreadsheet task (write Python code)`, output only raw executable Python code:",
+            "When the instruction explicitly names a target cell, range, or column such as `single cell",
+            "Before saving spreadsheet edits, verify in code that every planned write target is inside "
+          ]
+        },
+        {
+          "night": 3,
+          "val_hard": 0.175,
+          "action": "greedy_flat",
+          "edits": [
+            "OVERRIDE all inference rules for spreadsheet destinations: if the instruction names an exa",
+            "For spreadsheet tasks, never use `Workbook()`, never add/remove/rename sheets, and never m",
+            "When a spreadsheet instruction says to write a formula or result in a whole column such as",
+            "If no explicit output cell/range is named, locate an existing blank answer/output cell by "
+          ]
+        }
+      ],
+      "tokens": 4012709,
+      "final_skill_tail": "ange(3, 7)` unless the prompt explicitly gives that exact range.\n- If no explicit output cell/range is named, locate an existing blank answer/output cell by nearby labels such as `answer`, `result`, `count`, `formula`, or the blank cell adjacent to the relevant prompt/table; write to exactly one such existing cell for single-cell answers and raise no exception.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

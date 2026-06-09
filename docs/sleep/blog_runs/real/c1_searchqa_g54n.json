@@ -1,0 +1,65 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.4-nano/optimizer=azure:gpt-5.5",
+  "gate": "off",
+  "gate_metric": "hard",
+  "n_improved": 1,
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "split": {
+        "train": 10,
+        "val": 200,
+        "test": 1400
+      },
+      "dream_train": 5,
+      "test_before": 0.1993,
+      "test_after": 0.2293,
+      "delta": 0.03,
+      "improved": true,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.1993,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.275,
+          "action": "greedy_improved",
+          "edits": [
+            "Never return an empty string: if the task requests context, a document excerpt, or a retri",
+            "For context-passage tasks, use this exact format at the start of the response: `## Context",
+            "When a Wikipedia page title is requested or implied, include the page title verbatim in `[",
+            "If the user includes a prefix such as `(quick one)`, preserve that prefix before `## Conte"
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.22,
+          "action": "greedy_regressed",
+          "edits": [
+            "OVERRIDE for context-passage tasks: return plain text only and never wrap the output in `<",
+            "For context-passage tasks, do not answer, summarize, or provide a factoid; always output t",
+            "When the user includes a prefix such as `(quick one)`, the response must begin exactly `(q",
+            "For Wikipedia context passages, use only the English Wikipedia article whose page title ex"
+          ]
+        },
+        {
+          "night": 3,
+          "val_hard": 0.205,
+          "action": "greedy_regressed",
+          "edits": [
+            "OVERRIDE the Wikipedia-only context format when the requested/retrieved source is not Wiki",
+            "For all context-passage tasks, output exactly one context passage and then stop immediatel",
+            "For context-passage tasks, never replace the requested passage with a factoid or answer se",
+            "When choosing a context passage, match the requested entity/page title exactly in `[TLE]`,"
+          ]
+        }
+      ],
+      "tokens": 9998916,
+      "final_skill_tail": "[DOC] [TLE]` or, if a prefix is present, exactly `<prefix> ## Context\\n[DOC] [TLE]`.\n- When choosing a context passage, match the requested entity/page title exactly in `[TLE]`, including disambiguators and locations such as `Lutherville-Timonium, Maryland - Wikipedia`; never substitute a search result, store directory, shorter related title, or unrelated page.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

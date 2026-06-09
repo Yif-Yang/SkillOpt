@@ -1,0 +1,38 @@
+[matrix] 18 runs, max_conc=3, workers=16, test=FULL
+[matrix] launch: c1_searchqa_g55 -> c1_searchqa_g55.json
+[matrix] launch: c1_searchqa_g54m -> c1_searchqa_g54m.json
+[matrix] launch: c1_searchqa_g54n -> c1_searchqa_g54n.json
+[matrix] done: c1_searchqa_g54m (rc=0)
+[matrix] launch: c2_searchqa_g55 -> c2_searchqa_g55.json
+[matrix] done: c1_searchqa_g54n (rc=0)
+[matrix] launch: c2_searchqa_g54m -> c2_searchqa_g54m.json
+[matrix] done: c2_searchqa_g54m (rc=0)
+[matrix] launch: c2_searchqa_g54n -> c2_searchqa_g54n.json
+[matrix] done: c2_searchqa_g54n (rc=0)
+[matrix] launch: c1_livemath_g55 -> c1_livemath_g55.json
+[matrix] done: c1_searchqa_g55 (rc=0)
+[matrix] launch: c1_livemath_g54m -> c1_livemath_g54m.json
+[matrix] done: c1_livemath_g54m (rc=0)
+[matrix] launch: c1_livemath_g54n -> c1_livemath_g54n.json
+[matrix] done: c1_livemath_g54n (rc=0)
+[matrix] launch: c2_livemath_g55 -> c2_livemath_g55.json
+[matrix] done: c1_livemath_g55 (rc=0)
+[matrix] launch: c2_livemath_g54m -> c2_livemath_g54m.json
+[matrix] done: c2_livemath_g54m (rc=0)
+[matrix] launch: c2_livemath_g54n -> c2_livemath_g54n.json
+[matrix] done: c2_livemath_g54n (rc=0)
+[matrix] launch: c1_spreadsheet_g55 -> c1_spreadsheet_g55.json
+[matrix] done: c2_searchqa_g55 (rc=0)
+[matrix] launch: c1_spreadsheet_g54m -> c1_spreadsheet_g54m.json
+[matrix] done: c2_livemath_g55 (rc=0)
+[matrix] launch: c1_spreadsheet_g54n -> c1_spreadsheet_g54n.json
+[matrix] done: c1_spreadsheet_g54m (rc=0)
+[matrix] launch: c2_spreadsheet_g55 -> c2_spreadsheet_g55.json
+[matrix] done: c1_spreadsheet_g54n (rc=0)
+[matrix] launch: c2_spreadsheet_g54m -> c2_spreadsheet_g54m.json
+[matrix] done: c2_spreadsheet_g54m (rc=0)
+[matrix] launch: c2_spreadsheet_g54n -> c2_spreadsheet_g54n.json
+[matrix] done: c2_spreadsheet_g54n (rc=0)
+[matrix] done: c2_spreadsheet_g55 (rc=0)
+[matrix] done: c1_spreadsheet_g55 (rc=0)
+[matrix] all done.

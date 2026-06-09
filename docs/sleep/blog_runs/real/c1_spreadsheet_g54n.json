@@ -1,0 +1,65 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.4-nano/optimizer=azure:gpt-5.5",
+  "gate": "off",
+  "gate_metric": "hard",
+  "n_improved": 0,
+  "results": [
+    {
+      "benchmark": "spreadsheet",
+      "split": {
+        "train": 10,
+        "val": 40,
+        "test": 280
+      },
+      "dream_train": 5,
+      "test_before": 0.225,
+      "test_after": 0.1179,
+      "delta": -0.1071,
+      "improved": false,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.225,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.075,
+          "action": "greedy_regressed",
+          "edits": [
+            "For every 'Spreadsheet task (write Python code)', return a complete, executable Python scr",
+            "For spreadsheet cell targeting, use the exact sheet names, cell addresses, ranges, row num",
+            "Preserve the workbook layout: do not insert, delete, reorder, or clear rows/columns/cells ",
+            "When the user asks for an Excel formula, write formula strings into the specified target c"
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.075,
+          "action": "greedy_flat",
+          "edits": [
+            "OVERRIDE for every 'Spreadsheet task (write Python code)': return raw Python code only, wi",
+            "Never use `wb.active`, `wb.worksheets[0]`, or a fallback hard-coded sheet name like `\"Shee",
+            "Before writing any spreadsheet result, create an explicit source-to-destination map from t",
+            "For formula-writing tasks, write Excel formula strings beginning with `=` into the request"
+          ]
+        },
+        {
+          "night": 3,
+          "val_hard": 0.075,
+          "action": "greedy_flat",
+          "edits": [
+            "OVERRIDE for every 'Spreadsheet task (write Python code)': the response must be raw Python",
+            "When the prompt asks for a formula, Excel expression, VBA code, or starts like a how-to re",
+            "If no target cell/range/column is named in the prompt, choose the destination only from ex",
+            "For split, transfer, copy, and table-fill tasks, identify source and destination tables by"
+          ]
+        }
+      ],
+      "tokens": 1943953,
+      "final_skill_tail": "ever create a new answer area or write to arbitrary cells.\n- For split, transfer, copy, and table-fill tasks, identify source and destination tables by their existing header rows, write only under destination headers named in the prompt, start at the first data row below those headers, and never overwrite source-table cells unless the prompt explicitly says to.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

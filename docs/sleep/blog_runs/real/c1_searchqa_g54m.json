@@ -1,0 +1,65 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.4-mini/optimizer=azure:gpt-5.5",
+  "gate": "off",
+  "gate_metric": "hard",
+  "n_improved": 1,
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "split": {
+        "train": 10,
+        "val": 200,
+        "test": 1400
+      },
+      "dream_train": 5,
+      "test_before": 0.3436,
+      "test_after": 0.5557,
+      "delta": 0.2121,
+      "improved": true,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.3436,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.685,
+          "action": "greedy_improved",
+          "edits": [
+            "Never return an empty response; if relevant information is available, output at least the ",
+            "When the task asks for or implies a context excerpt, start the answer with the exact secti",
+            "For quick requests labeled \"quick one\", preserve the exact prefix \"(quick one) \" immediate",
+            "In \"## Context\" outputs, copy titles and paragraph text verbatim from the provided or retr"
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.685,
+          "action": "greedy_flat",
+          "edits": [
+            "OVERRIDE any answer-only or QA extraction behavior: when the task asks for or implies a co",
+            "For context excerpt tasks, do not wrap the response in XML/HTML tags such as \"<answer>\" or",
+            "In every \"## Context\" output, the line after the header must use exactly this format: \"[DO",
+            "When the requested format includes \"(quick one) ## Context\", the first line must be exactl"
+          ]
+        },
+        {
+          "night": 3,
+          "val_hard": 0.53,
+          "action": "greedy_regressed",
+          "edits": [
+            "OVERRIDE answer extraction for retrieval/evidence tasks: if any source title and paragraph",
+            "For any request containing the phrase \"quick one\", the first line must be exactly \"(quick ",
+            "After a context header, output exactly one evidence line in the format \"[DOC] [TLE] <title",
+            "Before finalizing a context excerpt, reject any output containing \"<answer>\", \"</answer>\","
+          ]
+        }
+      ],
+      "tokens": 9704381,
+      "final_skill_tail": "copy the title and paragraph verbatim from the source, preserving punctuation, line breaks, and wording, and do not paraphrase.\n- Before finalizing a context excerpt, reject any output containing \"<answer>\", \"</answer>\", an answer-only phrase, or any text before the required first line; rewrite it to the required \"## Context\" or \"(quick one) ## Context\" format.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

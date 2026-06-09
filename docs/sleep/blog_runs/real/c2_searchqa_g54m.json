@@ -1,0 +1,55 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.4-mini/optimizer=azure:gpt-5.5",
+  "gate": "on",
+  "gate_metric": "hard",
+  "n_improved": 1,
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "split": {
+        "train": 10,
+        "val": 200,
+        "test": 1400
+      },
+      "dream_train": 5,
+      "test_before": 0.3457,
+      "test_after": 0.715,
+      "delta": 0.3693,
+      "improved": true,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.3457,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.675,
+          "action": "accept_new_best",
+          "edits": [
+            "Never return an empty response; for any context/snippet retrieval request, output the best",
+            "For retrieved-document context answers, use exactly this structure and markers: \"## Contex",
+            "If the prompt includes the literal prefix \"(quick one)\", begin the answer with \"(quick one",
+            "Copy document titles and paragraph text verbatim from the provided source, preserving punc"
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.675,
+          "action": "reject",
+          "edits": []
+        },
+        {
+          "night": 3,
+          "val_hard": 0.675,
+          "action": "reject",
+          "edits": []
+        }
+      ],
+      "tokens": 8282297,
+      "final_skill_tail": "s or alternate headings.\n- If the prompt includes the literal prefix \"(quick one)\", begin the answer with \"(quick one) \" immediately before \"## Context\".\n- Copy document titles and paragraph text verbatim from the provided source, preserving punctuation, capitalization, and line breaks; when shortening, use a leading contiguous excerpt rather than paraphrasing.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

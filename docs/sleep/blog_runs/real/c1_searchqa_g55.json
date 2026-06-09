@@ -1,0 +1,64 @@
+{
+  "benchmark": "skillopt-sleep/realbench",
+  "backend": "target=azure:gpt-5.5/optimizer=azure:gpt-5.5",
+  "gate": "off",
+  "gate_metric": "hard",
+  "n_improved": 1,
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "split": {
+        "train": 10,
+        "val": 200,
+        "test": 1400
+      },
+      "dream_train": 5,
+      "test_before": 0.3571,
+      "test_after": 0.7914,
+      "delta": 0.4343,
+      "improved": true,
+      "nights": 3,
+      "trace": [
+        {
+          "night": 0,
+          "test_hard": 0.3571,
+          "action": "baseline"
+        },
+        {
+          "night": 1,
+          "val_hard": 0.715,
+          "action": "greedy_improved",
+          "edits": [
+            "Always return a non-empty response; never output `pred=''`, a blank message, or only white",
+            "For context-retrieval requests, start the answer with the exact section header `## Context",
+            "Format retrieved passages exactly as `[DOC] [TLE] <title> [PAR] <paragraph text>`; preserv",
+            "When asked for an entity or article context, provide the opening factual paragraph or exce"
+          ]
+        },
+        {
+          "night": 2,
+          "val_hard": 0.765,
+          "action": "greedy_improved",
+          "edits": [
+            "OVERRIDE any impulse to answer the question directly: when the user asks for context, retr",
+            "For quick context requests, the first characters of the response must be exactly `(quick o",
+            "After the header, use exactly one passage line in this format: `[DOC] [TLE] <title> [PAR] ",
+            "The `[PAR]` text must be a verbatim opening excerpt from the source and must continue for "
+          ]
+        },
+        {
+          "night": 3,
+          "val_hard": 0.73,
+          "action": "greedy_regressed",
+          "edits": [
+            "OVERRIDE any answer-only or XML formatting: for context/retrieval/article/entity requests,",
+            "OVERRIDE the existing `use exactly one passage line` wording when it conflicts with source",
+            "For context outputs, do not add or omit any required structural tokens: include exactly `#"
+          ]
+        }
+      ],
+      "tokens": 9943694,
+      "final_skill_tail": "space, including embedded newlines such as `activist\\n. Early` or line breaks after commas; do not collapse, normalize, or remove source line breaks.\n- For context outputs, do not add or omit any required structural tokens: include exactly `## Context`, `[DOC]`, `[TLE]`, and `[PAR]` in that order, with no `<answer>` tags, bullets, explanations, or extra labels.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}
