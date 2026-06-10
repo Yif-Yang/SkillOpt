@@ -1,0 +1,87 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.4-mini",
+  "results": [
+    {
+      "benchmark": "spreadsheet",
+      "gate": "on",
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 40,
+      "n_test": 280,
+      "test_baseline": 0.3143,
+      "test_final": 0.3143,
+      "delta": 0.0,
+      "progression": [
+        0.3143,
+        0.3143,
+        0.3143,
+        0.3143,
+        0.3143,
+        0.3143
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.3143,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_dream": 20,
+          "val_hard": 0.275,
+          "test_hard": 0.3143,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_dream": 20,
+          "val_hard": 0.275,
+          "test_hard": 0.3143,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_dream": 20,
+          "val_hard": 0.275,
+          "test_hard": 0.3143,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_dream": 20,
+          "val_hard": 0.275,
+          "test_hard": 0.3143,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 5,
+          "n_train": 50,
+          "n_dream": 20,
+          "val_hard": 0.275,
+          "test_hard": 0.3143,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        }
+      ],
+      "tokens": 1150484,
+      "final_skill_tail": ""
+    }
+  ]
+}

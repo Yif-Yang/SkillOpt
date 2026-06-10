@@ -1,0 +1,87 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.4-mini",
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "gate": "on",
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 60,
+      "n_test": 1400,
+      "test_baseline": 0.7679,
+      "test_final": 0.7779,
+      "delta": 0.01,
+      "progression": [
+        0.7679,
+        0.7779,
+        0.7779,
+        0.7779,
+        0.7779,
+        0.7779
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.7679,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_dream": 20,
+          "val_hard": 0.8333,
+          "test_hard": 0.7779,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_dream": 20,
+          "val_hard": 0.8333,
+          "test_hard": 0.7779,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_dream": 20,
+          "val_hard": 0.8333,
+          "test_hard": 0.7779,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_dream": 20,
+          "val_hard": 0.8333,
+          "test_hard": 0.7779,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 5,
+          "n_train": 50,
+          "n_dream": 20,
+          "val_hard": 0.8333,
+          "test_hard": 0.7779,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        }
+      ],
+      "tokens": 8373097,
+      "final_skill_tail": "ct, prefer the shortest exact answer span from the context (e.g. a role, label, or title) rather than the broader parent entity.\n- Do not include generic category words such as 'King of', 'place', 'community', or other parent-class descriptors unless the question explicitly asks for the category; answer with the specific entity span only.\n- Keep the final answer concise: a few words or a short phrase only, with no explanatory wording inside the <answer> tags.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.4-nano",
+  "results": [
+    {
+      "benchmark": "livemath",
+      "gate": "on",
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 18,
+      "n_test": 124,
+      "test_baseline": 0.2258,
+      "test_final": 0.1694,
+      "delta": -0.0564,
+      "progression": [
+        0.2258,
+        0.1694,
+        0.1694,
+        0.1694,
+        0.1694
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.2258,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_dream": 20,
+          "val_hard": 0.3889,
+          "test_hard": 0.1694,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_dream": 20,
+          "val_hard": 0.3889,
+          "test_hard": 0.1694,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_dream": 20,
+          "val_hard": 0.3889,
+          "test_hard": 0.1694,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_dream": 10,
+          "val_hard": 0.3889,
+          "test_hard": 0.1694,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        }
+      ],
+      "tokens": 898472,
+      "final_skill_tail": "2/15+\\varepsilon<\\theta<1-\\delta_0', 'p>1', 'p<2^*/2'), treat endpoints as NOT allowed: never assume equality at a strict boundary; only accept answers consistent with strictness.\n- If there is a bounded parameter set defined with constants (e.g., 'for some absolute constant \\delta_0>0'), do not pick an answer that requires a specific unprovided value of that constant; only accept conclusions that hold uniformly for all such constants within the stated range.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

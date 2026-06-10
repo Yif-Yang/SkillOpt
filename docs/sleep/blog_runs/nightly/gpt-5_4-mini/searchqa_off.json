@@ -1,31 +1,31 @@
 {
   "experiment": "skillopt-sleep/nightly",
-  "model": "gpt-5.5",
+  "model": "gpt-5.4-mini",
   "results": [
     {
-      "benchmark": "spreadsheet",
+      "benchmark": "searchqa",
       "gate": "off",
       "nights": 5,
       "per_night": 10,
       "rollouts": 5,
-      "n_val": 40,
-      "n_test": 280,
-      "test_baseline": 0.625,
-      "test_final": 0.6286,
-      "delta": 0.0036,
+      "n_val": 60,
+      "n_test": 1400,
+      "test_baseline": 0.7664,
+      "test_final": 0.765,
+      "delta": -0.0014,
       "progression": [
-        0.625,
-        0.6179,
-        0.6,
-        0.6393,
-        0.6179,
-        0.6286
+        0.7664,
+        0.7729,
+        0.7807,
+        0.7693,
+        0.7743,
+        0.765
       ],
       "nights_log": [
         {
           "night": 0,
           "n_train": 0,
-          "test_hard": 0.625,
+          "test_hard": 0.7664,
           "action": "baseline",
           "accepted": false
         },
@@ -34,7 +34,7 @@
           "n_train": 10,
           "n_dream": 20,
           "val_hard": 0.0,
-          "test_hard": 0.6179,
+          "test_hard": 0.7729,
           "action": "greedy_applied",
           "accepted": true,
           "n_edits": 4
@@ -44,7 +44,7 @@
           "n_train": 20,
           "n_dream": 20,
           "val_hard": 0.0,
-          "test_hard": 0.6,
+          "test_hard": 0.7807,
           "action": "greedy_applied",
           "accepted": true,
           "n_edits": 4
@@ -54,34 +54,34 @@
           "n_train": 30,
           "n_dream": 20,
           "val_hard": 0.0,
-          "test_hard": 0.6393,
+          "test_hard": 0.7693,
           "action": "greedy_applied",
           "accepted": true,
-          "n_edits": 4
+          "n_edits": 3
         },
         {
           "night": 4,
           "n_train": 40,
           "n_dream": 20,
           "val_hard": 0.0,
-          "test_hard": 0.6179,
+          "test_hard": 0.7743,
           "action": "greedy_applied",
           "accepted": true,
-          "n_edits": 4
+          "n_edits": 3
         },
         {
           "night": 5,
           "n_train": 50,
           "n_dream": 20,
           "val_hard": 0.0,
-          "test_hard": 0.6286,
+          "test_hard": 0.765,
           "action": "greedy_applied",
           "accepted": true,
-          "n_edits": 4
+          "n_edits": 3
         }
       ],
-      "tokens": 13634053,
-      "final_skill_tail": "lear every target answer cell/range cell for which no computed output is mapped by assigning `None`, but do not clear or edit any non-target cell; this includes surplus cells in multi-row or multi-column target ranges.\n- When a target answer cell is inside a merged range, write the value only to that merged range's top-left anchor if the anchor is also within the provided target answer cells/ranges; otherwise do not unmerge cells or write to merged interiors.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+      "tokens": 28793340,
+      "final_skill_tail": " span.\n- OVERRIDE: When the context is a document list or article heading and the answer is not explicitly in the visible passage body, do not guess from the title or first noun phrase; return the shortest exact span actually supported by the visible context.\n- OVERRIDE: Prefer the exact answer span that directly resolves the question over any nearby prominent entity, source title, or broader named item; never default to the first named entity in the passage.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
     }
   ]
 }

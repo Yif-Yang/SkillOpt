@@ -59,5 +59,7 @@ docs/让*
 docs/sleep/blog_runs/real/*.err
 
 # nightly run sidecars
+docs/sleep/blog_runs/nightly/**/*.err
 docs/sleep/blog_runs/nightly/*.err
+docs/sleep/blog_runs/nightly/**/*.log
 docs/sleep/blog_runs/nightly/*.log

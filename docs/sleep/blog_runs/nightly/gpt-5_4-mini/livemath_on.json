@@ -1,0 +1,76 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.4-mini",
+  "results": [
+    {
+      "benchmark": "livemath",
+      "gate": "on",
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 18,
+      "n_test": 124,
+      "test_baseline": 0.25,
+      "test_final": 0.2581,
+      "delta": 0.0081,
+      "progression": [
+        0.25,
+        0.2581,
+        0.2581,
+        0.2581,
+        0.2581
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.25,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_dream": 20,
+          "val_hard": 0.3333,
+          "test_hard": 0.2581,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_dream": 20,
+          "val_hard": 0.3333,
+          "test_hard": 0.2581,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_dream": 20,
+          "val_hard": 0.3333,
+          "test_hard": 0.2581,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_dream": 10,
+          "val_hard": 0.3333,
+          "test_hard": 0.2581,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        }
+      ],
+      "tokens": 850604,
+      "final_skill_tail": " any hypothesis or bound in the final choice.\n- If two or more answer choices seem plausible, explicitly compare them against the exact wording of the problem and eliminate any choice that fails a stated quantifier, equality case, or boundary condition before selecting the final answer.\n- Keep the final response strictly in the required form \"<answer>X</answer>\" with exactly one choice label inside the tags, and do not include any extra text outside the tags.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

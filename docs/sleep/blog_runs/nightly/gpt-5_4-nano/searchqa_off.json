@@ -1,31 +1,31 @@
 {
   "experiment": "skillopt-sleep/nightly",
-  "model": "gpt-5.5",
+  "model": "gpt-5.4-nano",
   "results": [
     {
-      "benchmark": "spreadsheet",
+      "benchmark": "searchqa",
       "gate": "off",
       "nights": 5,
       "per_night": 10,
       "rollouts": 5,
-      "n_val": 40,
-      "n_test": 280,
-      "test_baseline": 0.625,
-      "test_final": 0.6286,
-      "delta": 0.0036,
+      "n_val": 60,
+      "n_test": 1400,
+      "test_baseline": 0.5543,
+      "test_final": 0.0264,
+      "delta": -0.5279,
       "progression": [
-        0.625,
-        0.6179,
-        0.6,
-        0.6393,
-        0.6179,
-        0.6286
+        0.5543,
+        0.49,
+        0.325,
+        0.0307,
+        0.0343,
+        0.0264
       ],
       "nights_log": [
         {
           "night": 0,
           "n_train": 0,
-          "test_hard": 0.625,
+          "test_hard": 0.5543,
           "action": "baseline",
           "accepted": false
         },
@@ -34,7 +34,7 @@
           "n_train": 10,
           "n_dream": 20,
           "val_hard": 0.0,
-          "test_hard": 0.6179,
+          "test_hard": 0.49,
           "action": "greedy_applied",
           "accepted": true,
           "n_edits": 4
@@ -44,17 +44,17 @@
           "n_train": 20,
           "n_dream": 20,
           "val_hard": 0.0,
-          "test_hard": 0.6,
+          "test_hard": 0.325,
           "action": "greedy_applied",
           "accepted": true,
-          "n_edits": 4
+          "n_edits": 2
         },
         {
           "night": 3,
           "n_train": 30,
           "n_dream": 20,
           "val_hard": 0.0,
-          "test_hard": 0.6393,
+          "test_hard": 0.0307,
           "action": "greedy_applied",
           "accepted": true,
           "n_edits": 4
@@ -64,24 +64,24 @@
           "n_train": 40,
           "n_dream": 20,
           "val_hard": 0.0,
-          "test_hard": 0.6179,
+          "test_hard": 0.0343,
           "action": "greedy_applied",
           "accepted": true,
-          "n_edits": 4
+          "n_edits": 2
         },
         {
           "night": 5,
           "n_train": 50,
           "n_dream": 20,
           "val_hard": 0.0,
-          "test_hard": 0.6286,
+          "test_hard": 0.0264,
           "action": "greedy_applied",
           "accepted": true,
-          "n_edits": 4
+          "n_edits": 3
         }
       ],
-      "tokens": 13634053,
-      "final_skill_tail": "lear every target answer cell/range cell for which no computed output is mapped by assigning `None`, but do not clear or edit any non-target cell; this includes surplus cells in multi-row or multi-column target ranges.\n- When a target answer cell is inside a merged range, write the value only to that merged range's top-left anchor if the anchor is also within the provided target answer cells/ranges; otherwise do not unmerge cells or write to merged interiors.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+      "tokens": 26537748,
+      "final_skill_tail": "n, apostrophes, commas, hyphens, spacing, and trailing characters exactly as shown; do not truncate (even if the model believes it should).\n- In `<answer>...</answer>`, output **only** the selected `[DOC] [TLE]` title string verbatim with **no extra whitespace, no prefixes/suffixes, and no additional text** (not even quotes).\n- Do not include any reasoning outside `<answer>...</answer>`; the final output must contain **only one** `<answer>...</answer>` block.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
     }
   ]
 }

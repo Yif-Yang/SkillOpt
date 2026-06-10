@@ -1,6 +1,6 @@
 {
   "experiment": "skillopt-sleep/nightly",
-  "model": "gpt-5.5",
+  "model": "gpt-5.4-nano",
   "results": [
     {
       "benchmark": "spreadsheet",
@@ -10,22 +10,22 @@
       "rollouts": 5,
       "n_val": 40,
       "n_test": 280,
-      "test_baseline": 0.625,
-      "test_final": 0.6286,
-      "delta": 0.0036,
+      "test_baseline": 0.2714,
+      "test_final": 0.3,
+      "delta": 0.0286,
       "progression": [
-        0.625,
-        0.6179,
-        0.6,
-        0.6393,
-        0.6179,
-        0.6286
+        0.2714,
+        0.3143,
+        0.3,
+        0.2964,
+        0.2821,
+        0.3
       ],
       "nights_log": [
         {
           "night": 0,
           "n_train": 0,
-          "test_hard": 0.625,
+          "test_hard": 0.2714,
           "action": "baseline",
           "accepted": false
         },
@@ -34,7 +34,7 @@
           "n_train": 10,
           "n_dream": 20,
           "val_hard": 0.0,
-          "test_hard": 0.6179,
+          "test_hard": 0.3143,
           "action": "greedy_applied",
           "accepted": true,
           "n_edits": 4
@@ -44,7 +44,7 @@
           "n_train": 20,
           "n_dream": 20,
           "val_hard": 0.0,
-          "test_hard": 0.6,
+          "test_hard": 0.3,
           "action": "greedy_applied",
           "accepted": true,
           "n_edits": 4
@@ -54,7 +54,7 @@
           "n_train": 30,
           "n_dream": 20,
           "val_hard": 0.0,
-          "test_hard": 0.6393,
+          "test_hard": 0.2964,
           "action": "greedy_applied",
           "accepted": true,
           "n_edits": 4
@@ -64,7 +64,7 @@
           "n_train": 40,
           "n_dream": 20,
           "val_hard": 0.0,
-          "test_hard": 0.6179,
+          "test_hard": 0.2821,
           "action": "greedy_applied",
           "accepted": true,
           "n_edits": 4
@@ -74,14 +74,14 @@
           "n_train": 50,
           "n_dream": 20,
           "val_hard": 0.0,
-          "test_hard": 0.6286,
+          "test_hard": 0.3,
           "action": "greedy_applied",
           "accepted": true,
-          "n_edits": 4
+          "n_edits": 3
         }
       ],
-      "tokens": 13634053,
-      "final_skill_tail": "lear every target answer cell/range cell for which no computed output is mapped by assigning `None`, but do not clear or edit any non-target cell; this includes surplus cells in multi-row or multi-column target ranges.\n- When a target answer cell is inside a merged range, write the value only to that merged range's top-left anchor if the anchor is also within the provided target answer cells/ranges; otherwise do not unmerge cells or write to merged interiors.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+      "tokens": 8299096,
+      "final_skill_tail": "reas.\n- OVERRIDE (multi-token parsing for semicolon-separated codes): When the instruction requires looking up multiple codes within a single cell where codes are separated by semicolons, split using `;` and treat each trimmed token as an independent code for matching; then write the lookup result corresponding to each token back into the required output target cells/ranges without concatenating or re-ordering tokens unless the instruction explicitly says so.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
     }
   ]
 }

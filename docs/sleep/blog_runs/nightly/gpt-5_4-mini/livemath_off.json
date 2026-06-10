@@ -1,0 +1,76 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.4-mini",
+  "results": [
+    {
+      "benchmark": "livemath",
+      "gate": "off",
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 18,
+      "n_test": 124,
+      "test_baseline": 0.2419,
+      "test_final": 0.25,
+      "delta": 0.0081,
+      "progression": [
+        0.2419,
+        0.2339,
+        0.2339,
+        0.2258,
+        0.25
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.2419,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.2339,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.2339,
+          "action": "greedy_noop",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.2258,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_dream": 10,
+          "val_hard": 0.0,
+          "test_hard": 0.25,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 3
+        }
+      ],
+      "tokens": 1342184,
+      "final_skill_tail": "e 'for each', 'whenever', 'if and only if', 'at least', 'exactly', 'equality', 'exceptional case', or a numerical cutoff, treat those as decisive constraints and do not answer from a theorem template or surface pattern match.\n- Before finalizing the label, compare the candidate choice against all stated assumptions and boundary cases; if only one option survives the full statement, choose that option even when another seems more common or initially plausible.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}
