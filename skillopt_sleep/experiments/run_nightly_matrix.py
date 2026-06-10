@@ -19,7 +19,7 @@ import sys
 import time
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-OUT = os.path.join(ROOT, "docs", "sleep", "blog_runs", "nightly")
+OUT_BASE = os.path.join(ROOT, "docs", "sleep", "blog_runs", "nightly")
 
 # (bench, gate). LiveMath first (slowest). gate variants of the same bench can
 # share the train pool but run independently.
@@ -49,9 +49,14 @@ def main(argv=None) -> int:
     ap.add_argument("--rollouts", type=int, default=5)
     ap.add_argument("--dream-factor", type=int, default=2)
     ap.add_argument("--model", default="gpt-5.5")
+    ap.add_argument("--out-subdir", default="", help="output subdir under nightly/ (default: derived from model)")
     ap.add_argument("--only", default="", help="comma filter e.g. searchqa_off")
     args = ap.parse_args(argv)
 
+    # model-specific output dir so different targets don't clobber each other.
+    # gpt-5.5 keeps the legacy flat path; others go to nightly/<model>/.
+    subdir = args.out_subdir or ("" if args.model == "gpt-5.5" else args.model.replace(".", "_"))
+    OUT = os.path.join(OUT_BASE, subdir) if subdir else OUT_BASE
     os.makedirs(OUT, exist_ok=True)
     cells = CELLS
     if args.only:
@@ -78,9 +83,14 @@ def main(argv=None) -> int:
             if is_done(out):
                 print(f"[nightly] skip (done): {name}", flush=True)
                 continue
+            # Route by model: the Responses endpoints (gpt4v scus/swc) serve ONLY
+            # gpt-5.5 / gpt-5.4. nano + mini are 404 there, so they must use the
+            # Managed-Identity "azure" backend (oaidr9, chat completions). Using
+            # the wrong backend silently 404s every call -> all-zero scores.
+            backend = "azure-responses" if args.model in ("gpt-5.5", "gpt-5.4") else "azure"
             cmd = [
                 sys.executable, "-m", "skillopt_sleep.experiments.run_nightly",
-                "--backend", "azure-responses", "--model", args.model,
+                "--backend", backend, "--model", args.model,
                 "--benchmarks", bench, "--gate", gate,
                 "--nights", str(args.nights), "--per-night", str(args.per_night),
                 "--rollouts", str(args.rollouts), "--dream-factor", str(args.dream_factor),
