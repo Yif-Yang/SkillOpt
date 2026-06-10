@@ -118,6 +118,11 @@ def contrastive_reflect(
             f"- BAD  attempt (score {rs.worst.hard:.1f}): {rs.worst.response[:200]}\n"
             f"  (bad failed: {rs.worst.fail_reason[:100]})"
         )
+    # the output contract the proposed rules must not violate (same guardrail the
+    # single-shot reflect uses — prevents harness-violating rules like "return VBA"
+    # or "ask the user for the range" on SpreadsheetBench).
+    from skillopt_sleep.backend import _task_guardrail
+    guard = _task_guardrail([(rs.task, rs.best) for rs in informative])
     prompt = (
         "You are SkillOpt's optimizer doing CONTRASTIVE reflection. For each task "
         "below the agent was run multiple times; some attempts succeeded and some "
@@ -125,6 +130,10 @@ def contrastive_reflect(
         f"and propose at most {edit_budget} SHORT, GENERAL, reusable rules for the "
         f"{target} that would make the good behavior reliable every time. Quote "
         "concrete thresholds/formats verbatim; do not paraphrase vaguely. "
+        "Every rule MUST obey the task output contract (if shown) — never propose "
+        "a rule that changes the required output format/language or tells the agent "
+        "to ask the user a question; such a rule scores ZERO.\n"
+        f"{guard}"
         'Return ONLY a JSON array: '
         '[{"op":"add","content":"<rule>","rationale":"<what good did that bad didnt>"}].\n\n'
         + "\n\n".join(blocks)

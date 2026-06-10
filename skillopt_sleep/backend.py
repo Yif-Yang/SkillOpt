@@ -256,6 +256,43 @@ def _extract_json(raw: str, kind: str):
         return None
 
 
+def _task_guardrail(pairs) -> str:
+    """Build an 'output contract' the optimizer must not violate.
+
+    ``pairs`` is a list of (TaskRecord, ReplayResult). We surface the benchmark's
+    own rollout system prompt (TaskRecord.system) plus a short, explicit list of
+    invariants, so the optimizer cannot learn rules that the evaluator can never
+    honor (the SpreadsheetBench failure mode: a learned "return ```vba```" or
+    "ask the user for the range" rule scores 0 because the harness runs only
+    ```python``` openpyxl and cannot answer questions).
+
+    Returns "" when no task carries a system contract (e.g. mined daily cases),
+    so non-benchmark runs are unchanged.
+    """
+    sys_txt = ""
+    for t, _ in pairs:
+        s = getattr(t, "system", "") or ""
+        if s.strip():
+            sys_txt = s.strip()
+            break
+    if not sys_txt:
+        return ""
+    # the system prompt can be long; keep the rules portion concise for the optimizer
+    contract = sys_txt
+    if len(contract) > 900:
+        contract = contract[:900] + " …"
+    invariants = (
+        "- Do NOT change the required output format or programming language.\n"
+        "- Do NOT tell the agent to ask the user a question or request more info; "
+        "it must always produce a best-effort answer from what is given.\n"
+        "- Keep every rule consistent with the contract above."
+    )
+    return (
+        "\n# Task output contract (rules MUST obey this — violating it scores 0)\n"
+        f"{contract}\n{invariants}\n"
+    )
+
+
 class CliBackend(Backend):
     """Common logic for real CLI-driven backends (claude / codex).
 
@@ -411,6 +448,13 @@ class CliBackend(Backend):
                 "\n# User preferences (honor these as priors when writing rules)\n"
                 + str(self.preferences).strip()
             )
+        # Task GUARDRAIL: the optimizer must not invent rules that violate the
+        # task's hard constraints (e.g. SpreadsheetBench answers MUST be a
+        # ```python``` openpyxl block — a learned "return ```vba```" or "ask the
+        # user for the range" rule scores 0 because the harness can't run VBA and
+        # can't ask questions). We surface the benchmark's own rollout system
+        # prompt (carried on TaskRecord.system) so proposed rules stay in-bounds.
+        guard_text = _task_guardrail(failures)
         prompt = (
             "You are SkillOpt's optimizer. The agent keeps failing the recurring "
             f"tasks below. Propose at most {edit_budget} bounded edits to the "
@@ -428,9 +472,15 @@ class CliBackend(Backend):
             "but outputs must be under a character limit), write an explicit, "
             "forceful OVERRIDE rule stating it supersedes the conflicting "
             "instruction, and put the hard requirement first.\n"
+            "HARD CONSTRAINT: every rule you write MUST be consistent with the "
+            "'Task output contract' below (if shown). NEVER propose a rule that "
+            "changes the required output format/language, tells the agent to ask "
+            "the user a question, or otherwise violates that contract — such a "
+            "rule scores ZERO because the evaluator cannot honor it.\n"
             'Return ONLY a JSON array: '
             '[{"op":"add|replace|delete","content":"<rule>","anchor":"<text to replace/delete, optional>","rationale":"<why>"}].\n\n'
             f"# Current {target}\n{cur_doc}\n"
+            f"{guard_text}"
             f"{criteria_text}\n"
             f"{pref_text}\n\n"
             f"# Recurring failures\n{fail_text}"
