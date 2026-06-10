@@ -1,0 +1,87 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.5",
+  "results": [
+    {
+      "benchmark": "spreadsheet",
+      "gate": "on",
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 40,
+      "n_test": 280,
+      "test_baseline": 0.6464,
+      "test_final": 0.6214,
+      "delta": -0.025,
+      "progression": [
+        0.6464,
+        0.6214,
+        0.6214,
+        0.6214,
+        0.6214,
+        0.6214
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.6464,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_dream": 20,
+          "val_hard": 0.725,
+          "test_hard": 0.6214,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_dream": 20,
+          "val_hard": 0.725,
+          "test_hard": 0.6214,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_dream": 20,
+          "val_hard": 0.725,
+          "test_hard": 0.6214,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_dream": 20,
+          "val_hard": 0.725,
+          "test_hard": 0.6214,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 5,
+          "n_train": 50,
+          "n_dream": 20,
+          "val_hard": 0.725,
+          "test_hard": 0.6214,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        }
+      ],
+      "tokens": 6158268,
+      "final_skill_tail": "book structure: do not create, delete, rename, or reorder sheets unless explicitly requested; write only the requested output cells and leave unrelated cells, formats, formulas, and source data unchanged.\n- For Excel formula/VBA requests, implement the requested worksheet result in the workbook cells when the environment expects an .xlsx output; if generating Python, keep it executable as plain code with no markdown fences and no incomplete try/except blocks.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

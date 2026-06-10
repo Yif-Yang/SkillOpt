@@ -57,3 +57,7 @@ docs/让*
 
 # matrix run stderr sidecars (openpyxl warnings only)
 docs/sleep/blog_runs/real/*.err
+
+# nightly run sidecars
+docs/sleep/blog_runs/nightly/*.err
+docs/sleep/blog_runs/nightly/*.log

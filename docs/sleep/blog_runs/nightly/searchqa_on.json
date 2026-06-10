@@ -1,0 +1,87 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.5",
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "gate": "on",
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 60,
+      "n_test": 1400,
+      "test_baseline": 0.7971,
+      "test_final": 0.8443,
+      "delta": 0.0472,
+      "progression": [
+        0.7971,
+        0.7971,
+        0.8443,
+        0.8443,
+        0.8443,
+        0.8443
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.7971,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_dream": 20,
+          "val_hard": 0.8167,
+          "test_hard": 0.7971,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_dream": 20,
+          "val_hard": 0.8667,
+          "test_hard": 0.8443,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_dream": 20,
+          "val_hard": 0.8667,
+          "test_hard": 0.8443,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_dream": 20,
+          "val_hard": 0.8667,
+          "test_hard": 0.8443,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 5,
+          "n_train": 50,
+          "n_dream": 20,
+          "val_hard": 0.8667,
+          "test_hard": 0.8443,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        }
+      ],
+      "tokens": 8774795,
+      "final_skill_tail": " example.\n- Use plain-answer format only: do not wrap answers in '<answer>' tags unless the user explicitly requests that exact tag format.\n- For Jeopardy-style clues, omit 'What is', 'Who is', question marks, and articles unless they are part of the entity; return only the answer term.\n- Do not expand a minimal answer span with extra first names, titles, descriptors, or category words; if the supported span is a surname or common noun, output only that span.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

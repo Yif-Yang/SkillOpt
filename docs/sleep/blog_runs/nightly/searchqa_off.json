@@ -1,0 +1,87 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.5",
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "gate": "off",
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 60,
+      "n_test": 1400,
+      "test_baseline": 0.8,
+      "test_final": 0.8229,
+      "delta": 0.0229,
+      "progression": [
+        0.8,
+        0.825,
+        0.8229,
+        0.805,
+        0.8079,
+        0.8229
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.8,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.825,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.8229,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 3
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.805,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.8079,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 3
+        },
+        {
+          "night": 5,
+          "n_train": 50,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.8229,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        }
+      ],
+      "tokens": 29637174,
+      "final_skill_tail": "m echo tasks, if the user message contains literal \"...\", copy those three dots only at their original positions and still copy all surrounding text; never replace the whole response or omitted-looking spans with just \"...\".\n- If a response is triggered by \"## Context\" echo rules, the first output token must be the user's first character and the final output token must be the user's final character; do not prepend, append, wrap, answer, or summarize anything.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}
