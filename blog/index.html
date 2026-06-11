@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anatomy of a Validation Gate — SkillOpt Technical Blog #1</title>
+<meta name="description" content="What 280+ ablation runs taught us about validation gates for skill optimization: when the gate matters, whether to gate the slow update, skill-aware reflection, gate-free selection — and SkillOpt-Sleep, the plugin that ships it all.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 23 23'%3E%3Crect width='10' height='10' fill='%23F25022'/%3E%3Crect x='13' width='10' height='10' fill='%237FBA00'/%3E%3Crect y='13' width='10' height='10' fill='%2300A4EF'/%3E%3Crect x='13' y='13' width='10' height='10' fill='%23FFB900'/%3E%3C/svg%3E">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  :root{
+    --paper:#f8f9fc; --ink:#1e293b; --muted:#64748b; --quiet:#94a3b8;
+    --line:#e2e8f0; --line-strong:#c7d2fe; --panel:#ffffff;
+    --blue:#4f46e5; --blue-dark:#3730a3; --teal:#0ea5e9; --gold:#f59e0b;
+    --good:#15803d; --bad:#be123c; --code-bg:#f1f5f9; --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:Inter,-apple-system,sans-serif;background:var(--paper);color:var(--ink);
+       font-size:16.5px;line-height:1.7}
+  .wrap{max-width:920px;margin:0 auto;padding:0 24px}
+  a{color:var(--blue);text-decoration:none}
+  a:hover{text-decoration:underline}
+  h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.2}
+
+  header.hero{background:linear-gradient(160deg,#eef2ff 0%,#f8f9fc 70%);border-bottom:1px solid var(--line);padding:64px 0 48px}
+  .crumb{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);font-weight:600;margin-bottom:16px}
+  .hero h1{font-size:42px;font-weight:600;max-width:840px}
+  .hero p.sub{margin-top:18px;font-size:19px;color:var(--muted);max-width:780px}
+  .meta{margin-top:22px;font-size:14px;color:var(--quiet)}
+  .badges{margin-top:18px;display:flex;flex-wrap:wrap;gap:9px}
+  .badge{background:var(--panel);border:1px solid var(--line-strong);color:var(--blue-dark);
+         padding:5px 13px;border-radius:999px;font-size:13px;font-weight:500}
+
+  nav.toc{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+          padding:20px 24px;margin:34px auto 0;font-size:14.5px}
+  nav.toc b{display:block;margin-bottom:8px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--quiet)}
+  nav.toc ol{margin-left:20px}
+  nav.toc li{margin:5px 0}
+
+  section{padding:46px 0 6px}
+  .qtag{display:inline-block;background:var(--blue);color:#fff;font-size:12.5px;font-weight:600;
+        letter-spacing:.1em;padding:4px 12px;border-radius:999px;margin-bottom:12px}
+  .qtag.alt{background:var(--teal)}
+  h2{font-size:30px;font-weight:600;margin-bottom:10px}
+  h3{font-size:20px;font-weight:600;margin:28px 0 8px}
+  p{margin:12px 0;color:#334155}
+  p.lede{font-size:18px;color:#475569}
+  ul,ol{margin:10px 0 10px 26px}
+  li{margin:7px 0;color:#334155}
+  .muted{color:var(--quiet);font-size:13.5px}
+
+  table{border-collapse:collapse;width:100%;margin:18px 0;font-size:14.5px;background:var(--panel)}
+  th{background:#eef2ff;text-align:left;font-weight:600;color:var(--blue-dark)}
+  th,td{border:1px solid var(--line);padding:9px 13px}
+  td.up{color:var(--good);font-weight:600}
+  td.down{color:var(--bad);font-weight:600}
+  td.hot{background:#fefce8}
+  .tbl-note{font-size:13px;color:var(--quiet);margin-top:-8px}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px 26px;margin:22px 0}
+  .panel.finding{border-left:4px solid var(--blue)}
+  .panel.finding b.t{display:block;font-size:15px;margin-bottom:5px;color:var(--blue-dark)}
+  .panel.gold{border-left:4px solid var(--gold);background:#fffbeb}
+  .panel.green{border-left:4px solid var(--good);background:#f0fdf4}
+
+  .pipeline{display:flex;flex-wrap:wrap;align-items:stretch;margin:22px 0 6px}
+  .stage{flex:1 1 145px;background:var(--panel);border:1px solid var(--line);border-radius:12px;
+         padding:14px 13px;margin:5px;min-width:145px}
+  .stage b{display:block;color:var(--blue-dark);margin-bottom:3px;font-size:14.5px}
+  .stage span{font-size:13px;color:var(--muted)}
+  .stage .n{display:inline-block;background:var(--blue);color:#fff;border-radius:50%;
+            width:21px;height:21px;text-align:center;line-height:21px;font-size:12px;margin-right:6px}
+
+  .bars{margin:20px 0}
+  .barrow{display:flex;align-items:center;margin:9px 0}
+  .barlbl{width:290px;font-size:14px;flex-shrink:0;color:#334155}
+  .bartrack{flex:1;background:#eef2ff;border-radius:6px;height:25px;overflow:hidden}
+  .barfill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;
+           padding-right:8px;color:#fff;font-size:12.5px;font-weight:600;min-width:36px}
+  .barfill.blue{background:linear-gradient(90deg,#6366f1,var(--blue-dark))}
+  .barfill.red{background:linear-gradient(90deg,#f43f5e,#9f1239)}
+  .barfill.green{background:linear-gradient(90deg,#22c55e,#15803d)}
+  .barfill.teal{background:linear-gradient(90deg,#38bdf8,#0369a1)}
+
+  pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;
+      padding:15px 18px;overflow-x:auto;font-size:13.5px;margin:14px 0;line-height:1.55}
+  code{font-family:"JetBrains Mono",Consolas,monospace}
+  p code,li code,td code{background:var(--code-bg);padding:1.5px 6px;border-radius:5px;font-size:13.5px}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:30px 0 4px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 18px}
+  .stat .num{font-family:Fraunces,serif;font-size:30px;font-weight:600;color:var(--blue-dark)}
+  .stat .lbl{font-size:13px;color:var(--muted);margin-top:3px}
+
+  .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:13px;margin:20px 0}
+  .feature{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .feature b{color:var(--blue-dark);font-size:15px}
+  .feature p{font-size:13.5px;margin:5px 0 0;color:var(--muted)}
+
+  .divider{height:1px;background:var(--line);margin:42px 0 0}
+  footer{margin-top:56px;background:#1e1b4b;color:#c7d2fe;padding:36px 0;font-size:14px}
+  footer a{color:#a5b4fc}
+  .sparkline{font-family:"JetBrains Mono",monospace;letter-spacing:1px;color:var(--blue-dark)}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="crumb">SkillOpt &middot; Technical Blog #1 &middot; June 2026</div>
+    <h1>Anatomy of a Validation Gate: What 280+ Runs Taught Us About Training Agent Skills</h1>
+    <p class="sub">SkillOpt trains an agent's skill document the way you train weights — with epochs,
+    batches, and a held-out validation gate. But <em>when</em> does the gate actually matter? Should the
+    epoch-end slow update be gated too? Can reflection be made skill-aware? Can you skip the gate
+    entirely? We ran a 280+-run ablation campaign to find out — and shipped the answers as
+    <a href="#sleep">SkillOpt-Sleep</a>, a nightly self-evolution plugin for Claude Code, Codex, and Copilot.</p>
+    <div class="badges">
+      <span class="badge">3 benchmarks &middot; full held-out tests</span>
+      <span class="badge">5 gate arms (C1&ndash;C5) &times; 4 hyper-parameter variants</span>
+      <span class="badge">4 model tiers incl. a local 4B</span>
+      <span class="badge">All raw results committed</span>
+    </div>
+    <div class="meta">SkillOpt team &middot; built on <a href="https://arxiv.org/abs/2605.23904">arXiv:2605.23904</a></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="toc">
+    <b>In this post</b>
+    <ol>
+      <li><a href="#setup">The campaign: five gate arms, three benchmarks, four model tiers</a></li>
+      <li><a href="#q1">Q1 — When does the validation gate matter, and which metric should it use?</a></li>
+      <li><a href="#q2">Q2 — Should the epoch-end slow update be gated too?</a></li>
+      <li><a href="#q3">Q3 — Skill-aware reflection: don't delete rules that weren't the problem</a></li>
+      <li><a href="#q4">Q4 — Can we skip the gate? Post-hoc and feature-side selection</a></li>
+      <li><a href="#sleep">SkillOpt-Sleep — shipping the recipe as a nightly plugin</a></li>
+      <li><a href="#repro">Reproducibility</a></li>
+    </ol>
+  </nav>
+
+  <div class="stats">
+    <div class="stat"><div class="num">280+</div><div class="lbl">gated-training runs in the ablation campaign (C1&ndash;C5 + SAR), plus 30+ deployment-scale plugin runs</div></div>
+    <div class="stat"><div class="num">+41 pts</div><div class="lbl">best single-cell lift (SpreadsheetBench, GPT-5.5: 0.39 &rarr; 0.80)</div></div>
+    <div class="stat"><div class="num">+7 pts</div><div class="lbl">what choosing the right gate <em>metric</em> is worth on partial-credit tasks</div></div>
+    <div class="stat"><div class="num">40 / 47</div><div class="lbl">runs where gating the slow update makes the final skill the best skill (vs 10/47 ungated)</div></div>
+  </div>
+</div>
+
+<section id="setup">
+  <div class="wrap">
+    <h2>The campaign</h2>
+    <p class="lede">SkillOpt's core loop: a frozen target agent rolls out tasks; a separate optimizer
+    model distills bounded add / delete / replace edits to a single skill document; a candidate is
+    accepted only if it does not lose to the current best on a held-out validation slice. That last
+    step — the <b>validation gate</b> — is the design choice this campaign interrogates.</p>
+    <p>We crossed <b>five gate arms</b> with <b>four optimization variants</b> (step-size &times;
+    schedule: <code>def / lr8 / const / lr8const</code>) on <b>three benchmarks</b> with real,
+    execution-grade evaluators, across <b>four target models</b> (GPT-5.5, GPT-5.4-mini,
+    GPT-5.4-nano, and a local Qwen3.5-4B). Optimizer: GPT-5.5 throughout.</p>
+    <table>
+      <thead><tr><th>Arm</th><th>Gate</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><b>C1</b></td><td>off</td><td>Every candidate skill is accepted unconditionally (ablation control; validation still measured).</td></tr>
+        <tr><td><b>C2</b></td><td>hard</td><td>Accept only if mean exact-correctness on the val slice does not drop.</td></tr>
+        <tr><td><b>C3</b></td><td>soft</td><td>Gate on partial-credit score (token-F1 / graded points / per-case progress).</td></tr>
+        <tr><td><b>C4</b></td><td>mixed</td><td>Gate on (hard + soft) / 2.</td></tr>
+        <tr><td><b>C5</b></td><td>hard + gated slow-update</td><td>Like C2, but the epoch-end slow update must also pass validation selection instead of being force-injected.</td></tr>
+      </tbody>
+    </table>
+    <p>Benchmarks: <b>SearchQA</b> (1,400-item held-out test, SQuAD exact match),
+    <b>LiveMathematicianBench</b> (124 frontier-math MCQs), and <b>SpreadsheetBench</b> (280 cases
+    where the agent's generated <code>openpyxl</code> code is actually executed and the produced
+    workbook is compared cell-by-cell against a golden one).</p>
+    <p class="muted">Methodology note, stated up front: each (arm &times; benchmark &times; model)
+    cell aggregates 4 hyper-parameter variants at a single seed, so we treat differences under
+    ~1 point as noise, tier our findings by confidence, and have publicly retracted one early
+    finding that didn't survive de-pooling. The full per-run tables — every cell, including the
+    unflattering ones — are committed alongside this post.</p>
+  </div>
+</section>
+
+<section id="q1">
+  <div class="wrap">
+    <span class="qtag">Question 1</span>
+    <h2>When does the validation gate matter — and which metric should it use?</h2>
+    <p class="lede">Answer: it depends on the task's <em>signal quality</em> — and once the task has
+    partial credit, the gate's <em>metric</em> is worth real points.</p>
+
+    <h3>Net lift by gate arm (final skill vs baseline, mean over 4 variants &times; 4 models)</h3>
+    <table>
+      <thead><tr><th>Benchmark</th><th>C1 no gate</th><th>C2 hard</th><th>C3 soft</th><th>C4 mixed</th></tr></thead>
+      <tbody>
+        <tr><td>SearchQA</td><td>+9.9 pts</td><td>+10.0 pts</td><td>+11.2 pts</td><td>+11.0 pts</td></tr>
+        <tr><td>LiveMathematicianBench</td><td>+12.5 pts</td><td>+13.2 pts</td><td colspan="2" style="color:var(--quiet)">n/a (MCQ has no partial credit)</td></tr>
+        <tr><td>SpreadsheetBench</td><td>+18.9 pts</td><td>+19.7 pts</td><td class="hot"><b>+24.0 pts</b></td><td class="hot"><b>+26.0 pts</b></td></tr>
+      </tbody>
+    </table>
+
+    <div class="panel finding">
+      <b class="t">Finding 1 — On clean-signal tasks the gate is insurance, not fuel.</b>
+      On SearchQA every arm lands within a point of +10: turning the gate off, or switching its
+      metric, doesn't change the destination. The optimization signal is so clean that almost every
+      proposed edit is genuinely good — the gate simply has nothing to reject.
+    </div>
+    <div class="panel finding">
+      <b class="t">Finding 2 — On partial-credit tasks, the gate <em>metric</em> is worth up to +7 points.</b>
+      SpreadsheetBench scores progress within each case. Gating on that <b>soft / mixed</b> signal
+      (C3/C4) beats both no-gate and hard-gate by 4&ndash;7 points on average — the
+      densest-information signal makes the best accept/reject decisions. If your task has partial
+      credit, gate on it.
+    </div>
+    <div class="panel finding">
+      <b class="t">Finding 3 — Where self-evolution actually goes wrong: weak model &times; noisy task.</b>
+      The one place we measured <em>negative</em> optimization at research scale is
+      LiveMath &times; GPT-5.4-nano: in 4 of 8 runs the "optimized" skill is worse than the
+      initial one (e.g. 0.282 &rarr; 0.242). A weak model on a noisy, no-partial-credit task ends up
+      fitting noise. Remember this cell — it reappears, much more dramatically, in the deployment
+      section below.
+    </div>
+    <p>The ranking that emerges: <b>task signal quality &gg; model tier &gt; hyper-parameters &asymp;
+    gate switch</b> — but the gate's value is asymmetric: it costs nothing where it's redundant and
+    pays off exactly where things get risky.</p>
+  </div>
+</section>
+
+<section id="q2">
+  <div class="wrap">
+    <span class="qtag">Question 2</span>
+    <h2>Should the epoch-end slow update be gated too?</h2>
+    <p class="lede">SkillOpt periodically consolidates the epoch's lessons into the skill — the
+    <em>slow update</em>. C1&ndash;C4 force-inject it. C5 makes it pass validation selection like any
+    other candidate. The result is one of our favorite findings of the campaign.</p>
+    <table>
+      <thead><tr><th></th><th>C2 (slow update force-injected)</th><th>C5 (slow update validation-gated)</th></tr></thead>
+      <tbody>
+        <tr><td>Mean net lift (46 paired runs)</td><td>baseline</td><td>&minus;0.3 pts (statistically indistinguishable)</td></tr>
+        <tr><td><b>Runs where final skill = best skill</b></td><td>10 / 47</td><td class="hot"><b>40 / 47</b></td></tr>
+      </tbody>
+    </table>
+    <div class="panel gold">
+      <b>Gating the slow update doesn't buy points — it buys determinism.</b>
+      Performance is a wash, but under C5 the artifact you ship at the end of training
+      <em>is</em> the artifact that validated best in 40 of 47 runs (vs 10 of 47 with
+      force-injection). No more "the best checkpoint was actually three steps ago": the final
+      skill and the best skill become the same file. For anything that deploys automatically —
+      like the nightly plugin below — that property is worth more than a point of accuracy.
+    </div>
+  </div>
+</section>
+
+<section id="q3">
+  <div class="wrap">
+    <span class="qtag">Question 3</span>
+    <h2>Skill-aware reflection: don't delete rules that weren't the problem</h2>
+    <p class="lede">A failure doesn't always mean the skill is wrong. Sometimes the rule was right
+    and the model just didn't follow it. Standard reflection can't tell the difference — so it
+    "fixes" valid rules and erases hard-won knowledge.</p>
+    <p><b>Skill-aware reflection (SAR)</b> makes the optimizer triage every failure first:
+    <code>SKILL_DEFECT</code> (the rule is wrong &rarr; edit the skill body) vs
+    <code>EXECUTION_LAPSE</code> (the rule is fine but was ignored &rarr; leave the body alone and
+    strengthen a protected appendix instead). We tested two routing modes against the matched
+    C1/C2 baselines on GPT-5.5, same hyper-parameters, same seeds:</p>
+    <table>
+      <thead><tr><th>SAR mode</th><th>Paired runs</th><th>Mean &Delta; lift vs baseline</th><th>Wins</th></tr></thead>
+      <tbody>
+        <tr><td>Route successes + failures</td><td>19</td><td>+0.3 pts</td><td>10/19</td></tr>
+        <tr><td class="hot"><b>Failure-only routing</b></td><td>22</td><td class="up">+1.6 pts</td><td><b>13/22</b></td></tr>
+      </tbody>
+    </table>
+    <div class="panel finding">
+      <b class="t">Finding — triage failures, leave successes alone.</b>
+      Routing only failures through the defect/lapse split is the configuration that helps
+      (+1.6 points on average over 22 paired runs, on top of an already-optimized baseline).
+      The mechanism matches the intuition: most of SAR's value comes from <em>not destroying
+      valid rules</em>, and successes were never going to destroy anything. Several SAR cells set
+      the campaign's per-benchmark records — e.g. SearchQA GPT-5.5 0.776 &rarr; <b>0.876</b>, the
+      best SearchQA score of the entire campaign.
+    </div>
+  </div>
+</section>
+
+<section id="q4">
+  <div class="wrap">
+    <span class="qtag">Question 4</span>
+    <h2>Can we skip the gate? Post-hoc selection and skill-feature-side checks</h2>
+    <p class="lede">Validation rollouts are the gate's main cost. Two cheaper alternatives — one
+    validated by the campaign, one earlier-stage but already useful in production.</p>
+
+    <h3>Validated: train gate-free, select post-hoc</h3>
+    <p>Because C1 still <em>measures</em> validation each step (it just doesn't reject), we can
+    compare gate-free training + after-the-fact checkpoint selection against true in-training
+    gating. On clean-signal tasks they are equivalent — C1's post-hoc-selected checkpoint matches
+    C2's gated result within noise. And a related, deliberately deflating observation: the last
+    checkpoint is <em>not worse</em> than the val-best checkpoint in most runs (under a hard gate,
+    13/16 ties-or-wins). The val signal is a guardrail, not an oracle — don't over-trust per-step
+    val rankings, and don't pay for more validation than the task's noise level requires.</p>
+
+    <h3>Earlier-stage: selection by skill-side features, no rollouts at all</h3>
+    <p>The longer-term question is whether a candidate edit can be screened by looking at the
+    <em>skill itself</em> — its constraints, structure, and consistency with the task's contract —
+    without spending a single validation rollout. Our first production instance of this idea is the
+    <b>output-contract guardrail</b> that ships in SkillOpt-Sleep: the optimizer is shown the
+    task's hard constraints (required output format and language, no clarifying questions) and any
+    proposed rule that violates them is rejected <em>by construction</em> — a pure feature-side
+    check with zero rollout cost.</p>
+    <div class="panel green">
+      <b>Measured effect of the feature-side guardrail (deployment runs, gate-free mode):</b>
+      on SpreadsheetBench it flipped gate-free consolidation from regressing to gaining on both the
+      strongest and weakest targets we tested (GPT-5.5: &minus;0.4 &rarr; +0.4 pts;
+      GPT-5.4-nano: &minus;5.0 &rarr; +2.9 pts) — by construction it can never reject a useful
+      edit, only ill-formed ones. Richer feature-side critics (rule redundancy, scope, conflict
+      detection) are the open research direction this campaign points to next.
+    </div>
+  </div>
+</section>
+
+<section id="sleep">
+  <div class="wrap">
+    <span class="qtag alt">From research to product</span>
+    <h2>SkillOpt-Sleep: the recipe, shipped as a nightly plugin 😴</h2>
+    <p class="lede">Everything above is distilled into an open-source plugin for
+    <b>Claude Code, Codex, and GitHub Copilot</b>. While you sleep, your idle API quota turns into
+    a five-stage offline cycle on your own usage history:</p>
+    <div class="pipeline">
+      <div class="stage"><b><span class="n">1</span>Harvest</b><span>Collect recent session transcripts from your local agent.</span></div>
+      <div class="stage"><b><span class="n">2</span>Mine</b><span>Distill the recurring tasks you actually ask for.</span></div>
+      <div class="stage"><b><span class="n">3</span>Dream</b><span>Replay each task in multi-rollout groups + synthetic variants.</span></div>
+      <div class="stage"><b><span class="n">4</span>Consolidate</b><span>Distill bounded skill edits from the good-vs-bad contrast.</span></div>
+      <div class="stage"><b><span class="n">5</span>Gate</b><span>Ship an edit only if it passes the held-out gate (Q1) — with the campaign's defaults baked in.</span></div>
+    </div>
+    <p>The campaign's answers are the plugin's defaults: validation gate <b>on</b> (Q1), gated
+    consolidation of nightly updates (Q2), contrastive failure-focused reflection (Q3), and the
+    feature-side guardrail protecting the gate-free mode (Q4). The output is a compact,
+    human-readable skill block in your agent's memory — reviewable, revertible, zero inference-time
+    overhead, and fully decoupled from the research codebase.</p>
+
+    <h3>Deployment-scale validation</h3>
+    <p>Research training uses hundreds of labeled tasks; a real user has ~10 a day. So we re-ran
+    the protocol at deployment scale — 5 nights, 10 new real tasks per night, dream-augmented —
+    against the same full test sets and evaluators as the campaign. End-to-end with real agents, on
+    the public <a href="https://github.com/garrytan/gbrain-evals">gbrain-evals</a>
+    <code>skillopt-v1</code> benchmark, the plugins drive real Claude Code and real Codex through
+    the full cycle: deficient seed skills go <b>0.00 &rarr; 1.00 on held-out tasks in all 4
+    seeds</b>. On the campaign benchmarks:</p>
+    <table>
+      <thead><tr><th>Benchmark (full test)</th><th>Target</th><th>Mode</th><th>Baseline &rarr; After</th><th>Gain</th></tr></thead>
+      <tbody>
+        <tr><td>SearchQA (1,400)</td><td>GPT-5.5</td><td>gated</td><td>0.797 &rarr; <b>0.844</b></td><td class="up">+4.7 pts</td></tr>
+        <tr><td>SearchQA</td><td>GPT-5.4-nano</td><td>gated</td><td>0.554 &rarr; <b>0.602</b></td><td class="up">+4.8 pts</td></tr>
+        <tr><td>LiveMathematicianBench (124)</td><td>GPT-5.5</td><td>gate-free</td><td>0.508 &rarr; <b>0.556</b></td><td class="up">+4.8 pts</td></tr>
+        <tr><td>SpreadsheetBench (280)</td><td>GPT-5.4-nano</td><td>gate-free + guardrail</td><td>0.271 &rarr; <b>0.300</b></td><td class="up">+2.9 pts</td></tr>
+        <tr><td>SpreadsheetBench</td><td>GPT-5.4-mini</td><td>gated</td><td>0.329 &rarr; <b>0.350</b></td><td class="up">+2.1 pts</td></tr>
+      </tbody>
+    </table>
+    <p class="tbl-note">Selected runs; complete night-by-night tables for every
+    (model &times; benchmark &times; mode) cell live in the repo and are regenerated
+    deterministically from committed raw JSON. Baselines match the campaign's for the same models,
+    so research and deployment numbers are directly comparable.</p>
+    <p>Gains arrive fast and the gate locks them in — the headline SearchQA run learned its winning
+    rule on night 2 and never gave it back:
+    <span class="sparkline">0.797 &rarr; 0.797 &rarr; 0.844 &rarr; 0.844 &rarr; 0.844 &rarr; 0.844</span>.</p>
+
+    <h3>Remember Finding 3? We stress-tested it.</h3>
+    <p>Q1's riskiest cell — weak model, noisy self-evolution signal — is exactly what a no-gate
+    nightly loop faces in the wild. So we ran the ablation: same weak model (GPT-5.4-nano,
+    SearchQA), same nights, same candidate edits, gate off vs gate on.</p>
+    <div class="bars">
+      <div class="barrow"><div class="barlbl">Night 0 baseline</div>
+        <div class="bartrack"><div class="barfill blue" style="width:57%">0.554</div></div></div>
+      <div class="barrow"><div class="barlbl">After 5 nights — <b>no gate</b> (ablation)</div>
+        <div class="bartrack"><div class="barfill red" style="width:6%">0.026</div></div></div>
+      <div class="barrow"><div class="barlbl">After 5 nights — <b>with the gate</b> (default)</div>
+        <div class="bartrack"><div class="barfill green" style="width:58%">0.570</div></div></div>
+    </div>
+    <div class="panel gold">
+      <b>This is the whole campaign in one picture.</b> Ungated, the optimizer adopted a
+      plausible-but-wrong rule and the obedient small model rode it off a cliff
+      (&minus;52.8 points in five nights). The gated twin rejected those same edits and never lost
+      a point. Research said the gate is insurance that matters most for weak models on noisy
+      signals — deployment proved it. SkillOpt-Sleep ships with the gate on by default.
+    </div>
+
+    <h3>Get started in one minute</h3>
+    <pre><code># Claude Code (plugin marketplace)
+/plugin marketplace add microsoft/SkillOpt
+/plugin install skillopt-sleep
+/skillopt-sleep                   # run one sleep cycle now
+/skillopt-sleep schedule 02:30    # or let it run nightly
+
+# Codex CLI                       # GitHub Copilot (MCP)
+bash plugins/codex/install.sh     # bash plugins/copilot/install.sh</code></pre>
+    <div class="features">
+      <div class="feature"><b>Gate on by default</b><p>hard / soft / mixed metrics — soft/mixed recommended for partial-credit tasks (Q1).</p></div>
+      <div class="feature"><b>Gated nightly consolidation</b><p>What ships is what validated best (Q2).</p></div>
+      <div class="feature"><b>Failure-focused reflection</b><p>Multi-rollout contrast + failure triage (Q3).</p></div>
+      <div class="feature"><b>Feature-side guardrail</b><p>Rollout-free contract check protects gate-free mode (Q4).</p></div>
+      <div class="feature"><b>Budgets &amp; preferences</b><p>Cap nightly tokens/wall-clock; steer the optimizer in plain text.</p></div>
+      <div class="feature"><b>Review-then-adopt</b><p>Every night writes a staging report; skills are plain markdown you can edit or revert.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="repro">
+  <div class="wrap">
+    <h2>Reproducibility</h2>
+    <p>Every number above traces to committed artifacts — no hand-edited tables:</p>
+    <ul>
+      <li><b>Campaign (C1&ndash;C5 + SAR):</b> full per-run tables in the research repo
+      (<code>outputs/blog_1/results.md</code>, <code>results_sar.md</code>), with the
+      confidence-tiered analysis — including one retracted finding — in
+      <code>analyse_results.md</code>.</li>
+      <li><b>Plugin (deployment scale):</b> raw per-run JSON under
+      <code>docs/sleep/blog_runs/</code>; tables regenerated deterministically by
+      <code>gen_blog.py</code> and <code>gen_nightly_blog.py</code>.</li>
+    </ul>
+    <pre><code># reproduce the deployment-scale nightly experiment
+SKILLOPT_SLEEP_WORKERS=32 PYTHONPATH=. python -m skillopt_sleep.experiments.run_nightly_matrix \
+  --model gpt-5.5 --max-conc 2 --nights 5 --per-night 10 --rollouts 5 --dream-factor 2
+PYTHONPATH=. python skillopt_sleep/experiments/gen_nightly_blog.py</code></pre>
+    <div class="divider"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><b>SkillOpt</b> &middot;
+    <a href="https://github.com/microsoft/SkillOpt">GitHub</a> &middot;
+    <a href="https://arxiv.org/abs/2605.23904">Paper</a> &middot;
+    <a href="https://microsoft.github.io/SkillOpt/">Project page</a> &middot;
+    <a href="https://pypi.org/project/skillopt/">PyPI</a></p>
+    <p style="margin-top:8px;opacity:.75">MIT license. Skills are plain markdown; your data never
+    leaves your machine — the sleep cycle calls only the model endpoints you already use.</p>
+  </div>
+</footer>
+
+</body>
+</html>
