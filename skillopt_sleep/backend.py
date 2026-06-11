@@ -41,7 +41,8 @@ class Backend:
     # Optional user preferences (free text) injected into reflect as a prior.
     preferences: str = ""
 
-    def attempt(self, task: TaskRecord, skill: str, memory: str) -> str:
+    def attempt(self, task: TaskRecord, skill: str, memory: str,
+                sample_id: int = 0) -> str:
         raise NotImplementedError
 
     def attempt_with_tools(
@@ -151,7 +152,8 @@ class MockBackend(Backend):
                     out.append(key)
         return out
 
-    def attempt(self, task: TaskRecord, skill: str, memory: str) -> str:
+    def attempt(self, task: TaskRecord, skill: str, memory: str,
+                sample_id: int = 0) -> str:
         ctx = (skill or "") + "\n" + (memory or "")
         rules = self._required_rules(task)
         # The "__harmful__" rule models a bad edit: even when present it makes
@@ -323,7 +325,13 @@ class CliBackend(Backend):
         return out
 
     # operations -----------------------------------------------------------
-    def attempt(self, task: TaskRecord, skill: str, memory: str) -> str:
+    def attempt(self, task: TaskRecord, skill: str, memory: str,
+                sample_id: int = 0) -> str:
+        # sample_id distinguishes repeated rollouts of the SAME (task, skill,
+        # memory) in the cache key. Without it the attempt cache collapses all
+        # K dream rollouts into one cached response (spread always 0), which
+        # silently disables contrastive reflection. sample_id=0 keeps the old
+        # key format so gate re-scoring still benefits from the cache.
         if task.system:
             # Benchmark carries its own (research-repo) rollout system prompt.
             # Use it verbatim with a neutral skill/memory section — this both
@@ -337,7 +345,8 @@ class CliBackend(Backend):
                 system = skill_section + system
             body = task.intent + ("\n\n" + task.context_excerpt if task.context_excerpt else "")
             prompt = f"{system}{mem_section}\n{body}"
-            key = "attempt:" + skill_hash(prompt)
+            salt = f"s{sample_id}:" if sample_id else ""
+            key = "attempt:" + salt + skill_hash(prompt)
             return self._cached_call(key, prompt, max_tokens=512)
         # generic path (mined daily-case tasks): neutral, content-filter-safe
         # wording. Apply the skill/memory as guidance, not as adversarial
@@ -352,7 +361,8 @@ class CliBackend(Backend):
             "Return ONLY the final answer text, nothing else."
         )
         # cache on (task, skill, memory) so identical hold-out re-scoring is free
-        key = "attempt:" + skill_hash(prompt)
+        salt = f"s{sample_id}:" if sample_id else ""
+        key = "attempt:" + salt + skill_hash(prompt)
         return self._cached_call(key, prompt, max_tokens=512)
 
     def judge(self, task: TaskRecord, response: str) -> Tuple[float, float, str]:
@@ -789,8 +799,8 @@ class DualBackend(Backend):
         self.optimizer = optimizer
         self.name = f"target={target.name}/optimizer={optimizer.name}"
 
-    def attempt(self, task, skill, memory):
-        return self.target.attempt(task, skill, memory)
+    def attempt(self, task, skill, memory, sample_id: int = 0):
+        return self.target.attempt(task, skill, memory, sample_id=sample_id)
 
     def attempt_with_tools(self, task, skill, memory, tools):
         return self.target.attempt_with_tools(task, skill, memory, tools)

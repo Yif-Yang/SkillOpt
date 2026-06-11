@@ -26,7 +26,11 @@ def _required_tools(task: TaskRecord) -> List[str]:
     return tools
 
 
-def replay_one(backend: Backend, task: TaskRecord, skill: str, memory: str) -> ReplayResult:
+def replay_one(backend: Backend, task: TaskRecord, skill: str, memory: str,
+               sample_id: int = 0) -> ReplayResult:
+    """``sample_id`` distinguishes repeated dream rollouts of the same
+    (task, skill, memory) in the attempt cache — without it all K rollouts
+    collapse to one cached response and the contrastive signal is always 0."""
     import time
     tools = _required_tools(task)
     tools_called: List[str] = []
@@ -35,7 +39,7 @@ def replay_one(backend: Backend, task: TaskRecord, skill: str, memory: str) -> R
     if tools:
         response, tools_called = backend.attempt_with_tools(task, skill, memory, tools)
     else:
-        response = backend.attempt(task, skill, memory)
+        response = backend.attempt(task, skill, memory, sample_id=sample_id)
     latency_ms = (time.time() - t0) * 1000.0
     tokens = max(0, backend.tokens_used() - tok_before)
     # if the backend doesn't track tokens (e.g. mock), approximate from text length

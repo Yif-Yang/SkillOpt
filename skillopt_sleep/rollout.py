@@ -77,12 +77,13 @@ def multi_rollout(
             workers = 1
     workers = max(1, min(workers, k))
     if workers == 1:
-        for _ in range(k):
-            rs.attempts.append(replay_one(backend, task, skill, memory))
+        for i in range(k):
+            rs.attempts.append(replay_one(backend, task, skill, memory, sample_id=i))
         return rs
     from concurrent.futures import ThreadPoolExecutor
     with ThreadPoolExecutor(max_workers=workers) as ex:
-        futs = [ex.submit(replay_one, backend, task, skill, memory) for _ in range(k)]
+        futs = [ex.submit(replay_one, backend, task, skill, memory, sample_id=i)
+                for i in range(k)]
         for f in futs:
             rs.attempts.append(f.result())
     return rs

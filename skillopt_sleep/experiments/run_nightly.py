@@ -50,6 +50,33 @@ def _score_test(backend, test_tasks, skill, memory="") -> float:
     return h
 
 
+def _tokens(text: str) -> set:
+    import re as _re
+    return {w for w in _re.findall(r"[a-z0-9]+", (text or "").lower()) if len(w) > 2}
+
+
+def _retrieve_similar(new_tasks: List[TaskRecord], history: List[TaskRecord],
+                      k: int) -> List[TaskRecord]:
+    """Associative recall for the dream phase: pick the K historical tasks most
+    lexically similar to tonight's new tasks (max Jaccard overlap against any
+    new task). This is the sleep framework's 'recall related past experience
+    and dream on it together' mechanism — cheaper than full replay, targeted
+    at what tonight's material is about. Pure stdlib, deterministic.
+    """
+    if not history or k <= 0:
+        return []
+    new_toks = [_tokens(t.intent) for t in new_tasks]
+    scored = []
+    for h in history:
+        ht = _tokens(h.intent)
+        if not ht:
+            continue
+        sim = max((len(ht & nt) / len(ht | nt)) if (ht | nt) else 0.0 for nt in new_toks)
+        scored.append((sim, h.id, h))
+    scored.sort(key=lambda x: (-x[0], x[1]))
+    return [h for _, _, h in scored[:k]]
+
+
 def _make_tasks(bench: str, items: List[dict], split: str, data_root: str, seed: int) -> List[TaskRecord]:
     spec = _BENCH[bench]
     mk = spec["mk"]
@@ -69,8 +96,15 @@ def _make_tasks(bench: str, items: List[dict], split: str, data_root: str, seed:
 
 def run_nightly(backend, bench, *, nights, per_night, rollouts, edit_budget,
                 gate_mode, dream_factor, test_limit, seed, data_root,
-                gate_val_cap=60) -> dict:
-    """One variant (gate on or off) of the multi-night cumulative experiment."""
+                gate_val_cap=60, replay_mode="none", retrieve_k=10) -> dict:
+    """One variant (gate on or off) of the multi-night cumulative experiment.
+
+    replay_mode controls what joins each night's dream beyond the new tasks:
+      none       — tonight's new tasks only (knowledge carries via the skill)
+      cumulative — ALL previous nights' real tasks are replayed every night
+      retrieval  — the retrieve_k most similar historical tasks join the dream
+                   (the sleep framework's associative-recall design)
+    """
     data_root = data_root or DATA_ROOT
     spec = _BENCH[bench]
     base = os.path.join(data_root, spec["sub"])
@@ -104,6 +138,7 @@ def run_nightly(backend, bench, *, nights, per_night, rollouts, edit_budget,
 
     skill = ""
     used = 0
+    history_real: List[TaskRecord] = []   # previous nights' real tasks
     for night in range(1, nights + 1):
         # this night's 10 NEW real tasks (cumulative pool grows as we consume)
         new_items = train_pool[used: used + per_night]
@@ -111,11 +146,21 @@ def run_nightly(backend, bench, *, nights, per_night, rollouts, edit_budget,
         if not new_items:
             break
         new_real = _make_tasks(bench, new_items, "train", data_root, seed)
+
+        # replay: which historical experience joins tonight's dream
+        if replay_mode == "cumulative":
+            replayed = list(history_real)
+        elif replay_mode == "retrieval":
+            replayed = _retrieve_similar(new_real, history_real, retrieve_k)
+        else:
+            replayed = []
+
         # dream: many rollout groups happen inside consolidate via rollouts_k;
         # we ALSO add light synthetic variants so the train pool is richer.
-        train_tasks = list(new_real)
+        dream_seed = new_real + replayed
+        train_tasks = list(dream_seed)
         if dream_factor > 0:
-            train_tasks = train_tasks + dream_augment(new_real, factor=dream_factor)
+            train_tasks = train_tasks + dream_augment(dream_seed, factor=dream_factor)
 
         # consolidate: reflect over this night's (real+dream) tasks, refine the
         # carried-over skill; gate on the val slice (or greedily if gate off).
@@ -127,10 +172,12 @@ def run_nightly(backend, bench, *, nights, per_night, rollouts, edit_budget,
         )
         if res.accepted:
             skill = res.new_skill
+        history_real.extend(new_real)
         # measure TEST after this night (the real progression signal)
         test_after = _score_test(backend, test_tasks, skill)
         nights_log.append({
             "night": night, "n_train": used,
+            "n_replayed": len(replayed),
             "n_dream": sum(1 for t in train_tasks if t.origin == "dream"),
             "val_hard": round(res.holdout_candidate, 4),
             "test_hard": round(test_after, 4),
@@ -141,6 +188,7 @@ def run_nightly(backend, bench, *, nights, per_night, rollouts, edit_budget,
     final_test = nights_log[-1]["test_hard"]
     return {
         "benchmark": bench, "gate": gate_mode,
+        "replay_mode": replay_mode, "retrieve_k": retrieve_k,
         "nights": nights, "per_night": per_night, "rollouts": rollouts,
         "n_val": len(val_tasks), "n_test": len(test_tasks),
         "test_baseline": round(base_test, 4), "test_final": round(final_test, 4),
@@ -166,6 +214,9 @@ def main(argv=None) -> int:
     ap.add_argument("--gate", default="both", choices=["on", "off", "both"])
     ap.add_argument("--test-limit", type=int, default=0)
     ap.add_argument("--gate-val-cap", type=int, default=60, help="cap val size for the gated variant")
+    ap.add_argument("--replay-mode", default="none", choices=["none", "cumulative", "retrieval"],
+                    help="what joins each night's dream: nothing / all history / top-K similar history")
+    ap.add_argument("--retrieve-k", type=int, default=10, help="K for --replay-mode retrieval")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--data-root", default="")
     ap.add_argument("--out", default="", help="write JSON here")
@@ -185,7 +236,8 @@ def main(argv=None) -> int:
                             rollouts=args.rollouts, edit_budget=args.edit_budget,
                             gate_mode=gate_mode, dream_factor=args.dream_factor,
                             test_limit=args.test_limit, seed=args.seed, data_root=data_root,
-                            gate_val_cap=args.gate_val_cap)
+                            gate_val_cap=args.gate_val_cap, replay_mode=args.replay_mode,
+                            retrieve_k=args.retrieve_k)
             results.append(r)
             if not args.json:
                 prog = " -> ".join(f"{x:.3f}" for x in r["progression"])
