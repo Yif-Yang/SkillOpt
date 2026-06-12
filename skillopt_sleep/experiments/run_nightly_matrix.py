@@ -87,11 +87,12 @@ def main(argv=None) -> int:
             if is_done(out):
                 print(f"[nightly] skip (done): {name}", flush=True)
                 continue
-            # Route by model: the Responses endpoints (gpt4v scus/swc) serve ONLY
-            # gpt-5.5 / gpt-5.4. nano + mini are 404 there, so they must use the
-            # Managed-Identity "azure" backend (oaidr9, chat completions). Using
-            # the wrong backend silently 404s every call -> all-zero scores.
-            backend = "azure-responses" if args.model in ("gpt-5.5", "gpt-5.4") else "azure"
+            # Route by model. As of 2026-06-12 the gpt4v Responses endpoints
+            # (scus/swc) serve gpt-5.5/5.4 AND gpt-5.4-mini/nano, while the whole
+            # Managed-Identity fleet (oaidr9 etc.) has public access disabled
+            # (403) - so everything routes to azure-responses. The "azure" MI
+            # fallback remains for environments where those endpoints reopen.
+            backend = "azure-responses"
             cmd = [
                 sys.executable, "-m", "skillopt_sleep.experiments.run_nightly",
                 "--backend", backend, "--model", args.model,
