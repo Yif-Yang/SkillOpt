@@ -49,14 +49,18 @@ def main(argv=None) -> int:
     ap.add_argument("--rollouts", type=int, default=5)
     ap.add_argument("--dream-factor", type=int, default=2)
     ap.add_argument("--model", default="gpt-5.5")
-    ap.add_argument("--out-subdir", default="", help="output subdir under nightly/ (default: derived from model)")
+    ap.add_argument("--out-base", default="", help="override the nightly/ output base (e.g. .../nightly_v2)")
+    ap.add_argument("--out-subdir", default="", help="output subdir under the base (default: derived from model)")
+    ap.add_argument("--replay-mode", default="none", choices=["none", "cumulative", "retrieval"])
+    ap.add_argument("--retrieve-k", type=int, default=10)
     ap.add_argument("--only", default="", help="comma filter e.g. searchqa_off")
     args = ap.parse_args(argv)
 
     # model-specific output dir so different targets don't clobber each other.
-    # gpt-5.5 keeps the legacy flat path; others go to nightly/<model>/.
+    # gpt-5.5 keeps the legacy flat path; others go to <base>/<model>/.
+    base = args.out_base or OUT_BASE
     subdir = args.out_subdir or ("" if args.model == "gpt-5.5" else args.model.replace(".", "_"))
-    OUT = os.path.join(OUT_BASE, subdir) if subdir else OUT_BASE
+    OUT = os.path.join(base, subdir) if subdir else base
     os.makedirs(OUT, exist_ok=True)
     cells = CELLS
     if args.only:
@@ -92,6 +96,7 @@ def main(argv=None) -> int:
                 sys.executable, "-m", "skillopt_sleep.experiments.run_nightly",
                 "--backend", backend, "--model", args.model,
                 "--benchmarks", bench, "--gate", gate,
+                "--replay-mode", args.replay_mode, "--retrieve-k", str(args.retrieve_k),
                 "--nights", str(args.nights), "--per-night", str(args.per_night),
                 "--rollouts", str(args.rollouts), "--dream-factor", str(args.dream_factor),
                 "--seed", "42", "--out", out, "--json",
