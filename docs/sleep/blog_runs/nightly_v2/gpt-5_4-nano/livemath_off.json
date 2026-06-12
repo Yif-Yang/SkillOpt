@@ -1,0 +1,82 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.4-nano",
+  "results": [
+    {
+      "benchmark": "livemath",
+      "gate": "off",
+      "replay_mode": "retrieval",
+      "retrieve_k": 10,
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 18,
+      "n_test": 124,
+      "test_baseline": 0.1613,
+      "test_final": 0.1935,
+      "delta": 0.0322,
+      "progression": [
+        0.1613,
+        0.2177,
+        0.2016,
+        0.2016,
+        0.1935
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.1613,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.2177,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.0,
+          "test_hard": 0.2016,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.0,
+          "test_hard": 0.2016,
+          "action": "greedy_noop",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_replayed": 10,
+          "n_dream": 30,
+          "val_hard": 0.0,
+          "test_hard": 0.1935,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        }
+      ],
+      "tokens": 3468926,
+      "final_skill_tail": "gest standard consequence of that exact condition (e.g., the local conformal structure/curvature constraint it implies) and ensure your final conclusion matches which option corresponds to that consequence.\n- In each attempt, align the final letter with the logical quantifier direction from the text (e.g., verify whether the definition says “whenever … then …” or “there exists … such that …”), and do not substitute a weaker/stronger quantifier interpretation.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

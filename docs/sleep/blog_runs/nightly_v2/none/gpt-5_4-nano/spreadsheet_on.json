@@ -1,0 +1,94 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.4-nano",
+  "results": [
+    {
+      "benchmark": "spreadsheet",
+      "gate": "on",
+      "replay_mode": "none",
+      "retrieve_k": 10,
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 40,
+      "n_test": 280,
+      "test_baseline": 0.3,
+      "test_final": 0.3286,
+      "delta": 0.0286,
+      "progression": [
+        0.3,
+        0.2643,
+        0.2643,
+        0.2643,
+        0.3286,
+        0.3286
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.3,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.3,
+          "test_hard": 0.2643,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.3,
+          "test_hard": 0.2643,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.3,
+          "test_hard": 0.2643,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.325,
+          "test_hard": 0.3286,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 5,
+          "n_train": 50,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.325,
+          "test_hard": 0.3286,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        }
+      ],
+      "tokens": 6351303,
+      "final_skill_tail": "th columns. Example predicate shape: `blank = (v is None) or (isinstance(v, str) and v.strip() == '')`.\n- When matching and deleting based on columns A and F (or A vs I), build a lookup `set` from the reference column (e.g., all nonblank F values) and compare row-by-row for the other column (e.g., A). Use exact row values with normalization like `strip()` for strings: `key = v.strip() if isinstance(v,str) else v` and skip blanks with the same blank predicate.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

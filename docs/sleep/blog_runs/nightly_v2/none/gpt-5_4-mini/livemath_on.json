@@ -1,0 +1,82 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.4-mini",
+  "results": [
+    {
+      "benchmark": "livemath",
+      "gate": "on",
+      "replay_mode": "none",
+      "retrieve_k": 10,
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 18,
+      "n_test": 124,
+      "test_baseline": 0.2419,
+      "test_final": 0.25,
+      "delta": 0.0081,
+      "progression": [
+        0.2419,
+        0.2419,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.2419,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.2222,
+          "test_hard": 0.2419,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.2778,
+          "test_hard": 0.25,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 3
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.2778,
+          "test_hard": 0.25,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_replayed": 0,
+          "n_dream": 10,
+          "val_hard": 0.2778,
+          "test_hard": 0.25,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        }
+      ],
+      "tokens": 1476735,
+      "final_skill_tail": " as \"for all\" versus \"there exists\" or an equality condition, choose the label matching the stated boundary case exactly, not a nearby true statement.\n- Do a final option-by-option elimination and only commit after checking which choice is actually supported by the given assumptions; do not answer from pattern-matching alone.\n- Preserve the required format exactly: think step by step, then output only \"<answer>X</answer>\" with a single letter inside the tags.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

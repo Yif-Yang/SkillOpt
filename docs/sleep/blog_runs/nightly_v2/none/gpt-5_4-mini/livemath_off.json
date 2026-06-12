@@ -1,0 +1,82 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.4-mini",
+  "results": [
+    {
+      "benchmark": "livemath",
+      "gate": "off",
+      "replay_mode": "none",
+      "retrieve_k": 10,
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 18,
+      "n_test": 124,
+      "test_baseline": 0.2581,
+      "test_final": 0.2339,
+      "delta": -0.0242,
+      "progression": [
+        0.2581,
+        0.2581,
+        0.2581,
+        0.2823,
+        0.2339
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.2581,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.2581,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 3
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.2581,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 3
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.2823,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 3
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_replayed": 0,
+          "n_dream": 10,
+          "val_hard": 0.0,
+          "test_hard": 0.2339,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        }
+      ],
+      "tokens": 2550221,
+      "final_skill_tail": "ion-style statements, prioritize the exact conclusion indicated by the theorem statement, including any equality or exception cases; if the claim is about a specific structure under a named condition, do not swap to an unrelated alternative choice.\n- If several options seem plausible, compare them against the known theorem with the strongest matching condition and select only the choice that satisfies every stated assumption; never guess from partial overlap.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

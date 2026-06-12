@@ -1,0 +1,94 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.4-mini",
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "gate": "off",
+      "replay_mode": "none",
+      "retrieve_k": 10,
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 60,
+      "n_test": 1400,
+      "test_baseline": 0.7736,
+      "test_final": 0.7707,
+      "delta": -0.0029,
+      "progression": [
+        0.7736,
+        0.7864,
+        0.7864,
+        0.7736,
+        0.7729,
+        0.7707
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.7736,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.7864,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 1
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.7864,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 1
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.7736,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 3
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.7729,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 3
+        },
+        {
+          "night": 5,
+          "n_train": 50,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.7707,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 2
+        }
+      ],
+      "tokens": 25654482,
+      "final_skill_tail": "pan that is fully supported by the context, but preserve every token needed for exact match; do not shorten away titles or prepend/omit words that change the surface form.\n- When the context quotes or names a well-known source, answer with the exact canonical title/name, not a shortened nickname or partial form.\n- Use the full entity string that best matches the quoted text; do not drop prefixes, hyphens, or descriptive parts that are part of the proper name.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

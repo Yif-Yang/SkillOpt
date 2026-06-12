@@ -1,0 +1,82 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.4-mini",
+  "results": [
+    {
+      "benchmark": "livemath",
+      "gate": "on",
+      "replay_mode": "retrieval",
+      "retrieve_k": 10,
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 18,
+      "n_test": 124,
+      "test_baseline": 0.2339,
+      "test_final": 0.2177,
+      "delta": -0.0162,
+      "progression": [
+        0.2339,
+        0.2339,
+        0.2177,
+        0.2177,
+        0.2177
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.2339,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.2778,
+          "test_hard": 0.2339,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 1
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.3333,
+          "test_hard": 0.2177,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.3333,
+          "test_hard": 0.2177,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_replayed": 10,
+          "n_dream": 30,
+          "val_hard": 0.3333,
+          "test_hard": 0.2177,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        }
+      ],
+      "tokens": 2489120,
+      "final_skill_tail": "different statements.\n- Use the exact hypothesis wording to resolve equality/endpoint cases, especially when the statement says \"totally geodesic boundary\", \"compact\", \"n\\ge 3\", or \"p>1 if N=1,2\"; if an option depends on an endpoint, reject it unless the endpoint is explicitly included.\n- Always finish with exactly one choice label inside \"<answer>...</answer>\" and nothing else; never add commentary that could replace the choice or change the required format.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.4-mini",
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "gate": "on",
+      "replay_mode": "none",
+      "retrieve_k": 10,
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 60,
+      "n_test": 1400,
+      "test_baseline": 0.7707,
+      "test_final": 0.7757,
+      "delta": 0.005,
+      "progression": [
+        0.7707,
+        0.78,
+        0.7757,
+        0.7757,
+        0.7757,
+        0.7757
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.7707,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.8167,
+          "test_hard": 0.78,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 3
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.8667,
+          "test_hard": 0.7757,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 3
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.8667,
+          "test_hard": 0.7757,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.8667,
+          "test_hard": 0.7757,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 5,
+          "n_train": 50,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.8667,
+          "test_hard": 0.7757,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        }
+      ],
+      "tokens": 14140388,
+      "final_skill_tail": "f. Use the exact name stated in the passage, e.g. if the passage says \"Norwegian playwright Henrik Ibsen,\" output \"Henrik Ibsen\".\n- Anchor the answer to the specific entity described by the surrounding words immediately after reading the context; do not copy the most prominent title if it is not the asked-for entity.\n- Keep the final response minimal and exact: output only the entity name inside <answer>...</answer>, for example <answer>Henrik Ibsen</answer>.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

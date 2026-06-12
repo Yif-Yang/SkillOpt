@@ -1,0 +1,82 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.5",
+  "results": [
+    {
+      "benchmark": "livemath",
+      "gate": "off",
+      "replay_mode": "none",
+      "retrieve_k": 10,
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 18,
+      "n_test": 124,
+      "test_baseline": 0.5081,
+      "test_final": 0.4919,
+      "delta": -0.0162,
+      "progression": [
+        0.5081,
+        0.5081,
+        0.5081,
+        0.5,
+        0.4919
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.5081,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.5081,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.5081,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.5,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_replayed": 0,
+          "n_dream": 10,
+          "val_hard": 0.0,
+          "test_hard": 0.4919,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 3
+        }
+      ],
+      "tokens": 8705901,
+      "final_skill_tail": "e an option that treats the parameters as arbitrary or independently varying.\n- For primitive group questions with socle “PSU(3,q)” and “q=p^m\\ge 7” for odd p, apply the large odd unitary-group classification and ignore small-q, even-q, or sporadic-exception options.\n- Before selecting A/B/C/D, check whether each option satisfies every exact hypothesis and extremal phrase in the prompt; reject answers that are only true under weakened or different hypotheses.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

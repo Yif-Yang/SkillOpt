@@ -1,0 +1,94 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.5",
+  "results": [
+    {
+      "benchmark": "spreadsheet",
+      "gate": "on",
+      "replay_mode": "retrieval",
+      "retrieve_k": 10,
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 40,
+      "n_test": 280,
+      "test_baseline": 0.6357,
+      "test_final": 0.6179,
+      "delta": -0.0178,
+      "progression": [
+        0.6357,
+        0.6357,
+        0.6357,
+        0.6179,
+        0.6179,
+        0.6179
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.6357,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.675,
+          "test_hard": 0.6357,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.675,
+          "test_hard": 0.6357,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.7,
+          "test_hard": 0.6179,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.7,
+          "test_hard": 0.6179,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 5,
+          "n_train": 50,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.7,
+          "test_hard": 0.6179,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        }
+      ],
+      "tokens": 10522193,
+      "final_skill_tail": "lt\", \"0-15\", IDs, dates, and criteria instead of hardcoding fixed cell addresses.\n- When source cells may contain formulas or displayed results, load a second workbook with `data_only=True` for reading values, and write changes to the normal workbook.\n- When moving/inserting columns, copy every row’s value and style with `from copy import copy`, adjust the original source index after insertion, and delete the old column only after the new column is populated.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

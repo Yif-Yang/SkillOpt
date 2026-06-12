@@ -1,0 +1,82 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.4-mini",
+  "results": [
+    {
+      "benchmark": "livemath",
+      "gate": "off",
+      "replay_mode": "retrieval",
+      "retrieve_k": 10,
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 18,
+      "n_test": 124,
+      "test_baseline": 0.2661,
+      "test_final": 0.2419,
+      "delta": -0.0242,
+      "progression": [
+        0.2661,
+        0.2581,
+        0.2177,
+        0.2581,
+        0.2419
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.2661,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.2581,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.0,
+          "test_hard": 0.2177,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.0,
+          "test_hard": 0.2581,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_replayed": 10,
+          "n_dream": 30,
+          "val_hard": 0.0,
+          "test_hard": 0.2419,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        }
+      ],
+      "tokens": 3578439,
+      "final_skill_tail": "the stem names a theorem, classification, or known criterion, verify the answer against the theorem's exact conclusion and boundary cases, not a plausible variant; if the theorem yields a single valid option, keep that label fixed.\n- For multiple-choice mathematics, compare each option against the entire statement, including quantifiers such as \"for all\" and \"there exists\" and any extremal/equality conditions; discard any option that fails even one condition.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

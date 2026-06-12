@@ -1,0 +1,94 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.5",
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "gate": "off",
+      "replay_mode": "none",
+      "retrieve_k": 10,
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 60,
+      "n_test": 1400,
+      "test_baseline": 0.8007,
+      "test_final": 0.84,
+      "delta": 0.0393,
+      "progression": [
+        0.8007,
+        0.84,
+        0.8443,
+        0.8407,
+        0.8443,
+        0.84
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.8007,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.84,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 2
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.8443,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 1
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.8407,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 3
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.8443,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 2
+        },
+        {
+          "night": 5,
+          "n_train": 50,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.84,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 3
+        }
+      ],
+      "tokens": 26537262,
+      "final_skill_tail": "nside <answer>...</answer>, give the shortest exact answer span that fully answers the question; remove extra descriptors such as \"funeral\" when the answer is simply \"pyre\".\n- When a document title or passage has an obvious missing/garbled character in a well-known name, output the standard spelling, e.g. \"Vaclav Havel\" not \"Vclav Havel\".\n- For named characters or works, output the complete canonical name, including hyphens, e.g. \"Winnie-the-Pooh\" not \"Pooh\".\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

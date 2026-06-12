@@ -1,0 +1,94 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.4-mini",
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "gate": "off",
+      "replay_mode": "retrieval",
+      "retrieve_k": 10,
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 60,
+      "n_test": 1400,
+      "test_baseline": 0.7757,
+      "test_final": 0.7621,
+      "delta": -0.0136,
+      "progression": [
+        0.7757,
+        0.7886,
+        0.7793,
+        0.7714,
+        0.7736,
+        0.7621
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.7757,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.7886,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 2
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.0,
+          "test_hard": 0.7793,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.0,
+          "test_hard": 0.7714,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.0,
+          "test_hard": 0.7736,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 5,
+          "n_train": 50,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.0,
+          "test_hard": 0.7621,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        }
+      ],
+      "tokens": 30380843,
+      "final_skill_tail": "r noun or title, answer with the full exact name/title, not a shortened form or descriptor (e.g., use \"Winnie-the-Pooh\" not \"Pooh\", and \"bubble gum\" not \"Modern chewing gum\").\n- Prefer the canonical entity string from the passage over a paraphrase, synonym, or role-based label (e.g., \"Mary Pickford\" instead of \"America's sweetheart\").\n- Keep the final response inside \"<answer>...</answer>\" tags and make the content a concise exact-match span from the context.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

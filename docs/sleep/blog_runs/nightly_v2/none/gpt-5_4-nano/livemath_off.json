@@ -1,0 +1,82 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.4-nano",
+  "results": [
+    {
+      "benchmark": "livemath",
+      "gate": "off",
+      "replay_mode": "none",
+      "retrieve_k": 10,
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 18,
+      "n_test": 124,
+      "test_baseline": 0.2339,
+      "test_final": 0.1935,
+      "delta": -0.0404,
+      "progression": [
+        0.2339,
+        0.2177,
+        0.1935,
+        0.2177,
+        0.1935
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.2339,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.2177,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.1935,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.2177,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_replayed": 0,
+          "n_dream": 10,
+          "val_hard": 0.0,
+          "test_hard": 0.1935,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        }
+      ],
+      "tokens": 3145999,
+      "final_skill_tail": "ond to non-primitive actions or to different socles.\n- Rule 4: In every problem, map the question directly to the most specific applicable theorem/classification result you know for that exact topic and wording; if multiple candidates exist, choose the one that matches the maximum number of exact terms shown in the question (e.g., 'locally' + 'conformally homogeneous' + Lorentzian dimension >=3; or 'primitive' + 'socle PSU(3,q)' + 'q=p^m\\ge 7' + 'odd prime').\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

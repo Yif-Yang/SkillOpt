@@ -1,0 +1,94 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.4-mini",
+  "results": [
+    {
+      "benchmark": "spreadsheet",
+      "gate": "on",
+      "replay_mode": "none",
+      "retrieve_k": 10,
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 40,
+      "n_test": 280,
+      "test_baseline": 0.3536,
+      "test_final": 0.3393,
+      "delta": -0.0143,
+      "progression": [
+        0.3536,
+        0.3536,
+        0.3536,
+        0.3536,
+        0.3536,
+        0.3393
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.3536,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.3,
+          "test_hard": 0.3536,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.3,
+          "test_hard": 0.3536,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.3,
+          "test_hard": 0.3536,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.3,
+          "test_hard": 0.3536,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 5,
+          "n_train": 50,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.35,
+          "test_hard": 0.3393,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 4
+        }
+      ],
+      "tokens": 2663158,
+      "final_skill_tail": "el formula in the output cell.\n- When recreating formatting, copy the workbook’s existing style objects exactly for the target cells and preserve required text settings such as \"Wrap Text\" and heading styling like \"bolded\" and \"properly bordered\".\n- Respect the workbook’s real structure before editing: load the active or named sheet, remove only the explicitly requested sheet(s) such as \"Sheet3\" if present, and write results back to the specified output path.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

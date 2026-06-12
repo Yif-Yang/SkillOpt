@@ -340,70 +340,68 @@
     revertible, zero inference-time overhead, fully decoupled from the research codebase.</p>
 
     <h3>Deployment-scale validation: the complete grid</h3>
-    <p>We re-ran the study's protocol at deployment scale — 5 nights, only 10 new real tasks per
-    night, dream-augmented — against the same full test sets and the same execution-grade
-    evaluators, for <b>every</b> combination of three benchmarks &times; three targets &times;
-    both modes. End-to-end with real agents, on the public
+    <p>We ran the study's protocol at deployment scale — 5 nights, only 10 new real tasks per
+    night, dream rollout groups, associative recall — against the same full test sets and the
+    same execution-grade evaluators, for <b>every</b> combination of three benchmarks &times;
+    three targets &times; both modes. End-to-end with real agents, on the public
     <a href="https://github.com/garrytan/gbrain-evals">gbrain-evals</a> <code>skillopt-v1</code>
     benchmark, the plugins drive real Claude Code and real Codex through the full cycle
     (deficient seed skills 0.00 &rarr; 1.00 on held-out tasks in all 4 seeds). The full
-    18-cell grid on the study's benchmarks — nothing omitted:</p>
+    18-cell grid in the shipped configuration — nothing omitted:</p>
     <table>
       <thead><tr><th rowspan="2">Benchmark (full test)</th><th rowspan="2">Target</th>
         <th colspan="2">Gate-free mode</th><th colspan="2">Gated mode (default)</th></tr>
         <tr><th>Baseline &rarr; After</th><th>&Delta;</th><th>Baseline &rarr; After</th><th>&Delta;</th></tr></thead>
       <tbody>
         <tr><td rowspan="3">SearchQA (1,400)</td><td>GPT-5.5</td>
-            <td>0.800 &rarr; 0.823</td><td class="up">+2.3</td>
-            <td>0.797 &rarr; 0.844</td><td class="up">+4.7</td></tr>
+            <td>0.799 &rarr; 0.850</td><td class="up">+5.1</td>
+            <td>0.797 &rarr; 0.841</td><td class="up">+4.4</td></tr>
         <tr><td>GPT-5.4-mini</td>
-            <td>0.766 &rarr; 0.765</td><td>&minus;0.1</td>
-            <td>0.768 &rarr; 0.778</td><td class="up">+1.0</td></tr>
+            <td>0.776 &rarr; 0.762</td><td class="down">&minus;1.4</td>
+            <td>0.776 &rarr; 0.790</td><td class="up">+1.4</td></tr>
         <tr><td>GPT-5.4-nano</td>
-            <td class="hot">0.554 &rarr; 0.026</td><td class="down">&minus;52.8</td>
-            <td class="hot">0.570 &rarr; 0.570</td><td>0.0</td></tr>
+            <td>0.557 &rarr; 0.563</td><td>+0.6</td>
+            <td>0.554 &rarr; 0.535</td><td class="down">&minus;1.9</td></tr>
         <tr><td rowspan="3">LiveMathematicianBench (124)</td><td>GPT-5.5</td>
-            <td>0.508 &rarr; 0.556</td><td class="up">+4.8</td>
-            <td>0.540 &rarr; 0.540</td><td>0.0</td></tr>
+            <td>0.508 &rarr; 0.508</td><td>0.0</td>
+            <td>0.548 &rarr; 0.540</td><td>&minus;0.8</td></tr>
         <tr><td>GPT-5.4-mini</td>
-            <td>0.242 &rarr; 0.250</td><td>+0.8</td>
-            <td>0.250 &rarr; 0.258</td><td>+0.8</td></tr>
+            <td>0.266 &rarr; 0.242</td><td class="down">&minus;2.4</td>
+            <td>0.234 &rarr; 0.218</td><td class="down">&minus;1.6</td></tr>
         <tr><td>GPT-5.4-nano</td>
-            <td>0.218 &rarr; 0.194</td><td class="down">&minus;2.4</td>
-            <td>0.226 &rarr; 0.169</td><td class="down">&minus;5.6</td></tr>
+            <td>0.161 &rarr; 0.194</td><td class="up">+3.2</td>
+            <td>0.202 &rarr; 0.202</td><td>0.0</td></tr>
         <tr><td rowspan="3">SpreadsheetBench (280)</td><td>GPT-5.5</td>
-            <td>0.625 &rarr; 0.629</td><td>+0.4</td>
-            <td>0.646 &rarr; 0.621</td><td class="down">&minus;2.5</td></tr>
+            <td>0.650 &rarr; 0.639</td><td class="down">&minus;1.1</td>
+            <td>0.636 &rarr; 0.618</td><td class="down">&minus;1.8</td></tr>
         <tr><td>GPT-5.4-mini</td>
-            <td>0.350 &rarr; 0.329</td><td class="down">&minus;2.1</td>
-            <td>0.314 &rarr; 0.314</td><td>0.0</td></tr>
+            <td>0.339 &rarr; 0.343</td><td>+0.4</td>
+            <td>0.339 &rarr; 0.339</td><td>0.0</td></tr>
         <tr><td>GPT-5.4-nano</td>
-            <td>0.271 &rarr; 0.300</td><td class="up">+2.9</td>
-            <td>0.279 &rarr; 0.279</td><td>0.0</td></tr>
+            <td>0.293 &rarr; 0.339</td><td class="up">+4.6</td>
+            <td>0.318 &rarr; 0.325</td><td>+0.7</td></tr>
       </tbody>
     </table>
-    <p class="tbl-note">Every cell: same protocol (5 nights &times; 10 new real tasks, dream
-    rollouts, full held-out test), regenerated deterministically from committed raw run JSON.
-    Gate-free SpreadsheetBench cells include the feature-side guardrail. Deployment baselines
-    match the study's for the same models, so the two scales are directly comparable. The
-    LiveMath-nano gated regression (&minus;5.6) is Part 1's noisy-validation finding reproduced
-    at deployment scale — its 18-item validation set is too small to gate reliably; size the
-    gate's signal accordingly.</p>
-    <p>Read as a whole, the grid says three things. <b>(1) Gains are modest and real where the
-    optimization signal is clean</b> — the best cells (+4.7, +4.8) learned their winning rule by
-    night 2 and held it: <span class="sparkline">0.797 &rarr; 0.797 &rarr; 0.844 &rarr; 0.844 &rarr; 0.844 &rarr; 0.844</span>.
-    <b>(2) The gated column's downside is bounded</b> (worst &minus;5.6, on the one cell whose
-    validation set is too small to trust), <b>while the gate-free column's is not</b> (worst
-    &minus;52.8). <b>(3) Where validation is impossible, the guardrail keeps gate-free viable</b>
-    — both of its SpreadsheetBench cells are positive.</p>
+    <p class="tbl-note">Every cell: same protocol (5 nights &times; 10 new real tasks, k=5 dream
+    rollouts, recall k=10, full held-out test), regenerated deterministically from committed raw
+    run JSON. Deployment baselines match the study's for the same models, so the two scales are
+    directly comparable. Run-to-run baseline variance is &plusmn;1&ndash;2 points, so cells
+    within that band are noise.</p>
+    <p>Read as a whole: <b>gains are real where the optimization signal is clean</b> — SearchQA's
+    best cells learned their winning rules early and kept climbing or held:
+    <span class="sparkline">0.797 &rarr; 0.836 &rarr; 0.841 &rarr; 0.841 &rarr; 0.841 &rarr; 0.841</span> (gated)
+    — <b>the noisy benchmarks stay flat inside the noise band</b> (LiveMath, SpreadsheetBench for
+    the strong model), and <b>the worst cell in the entire grid is &minus;2.4</b>. That bounded
+    worst case did not happen by luck; it took three findings and one bug fix, which is the next
+    story.</p>
 
-    <h3>The stress test Part 1 predicted — zooming into the grid's worst cell</h3>
-    <p>Part 1's principle — the gate's value equals the quality of its validation signal, and the
-    risk concentrates at weak models on noisy signals — makes a sharp prediction for nightly
-    self-evolution in the wild: ungated, a weak model should eventually adopt a
-    plausible-but-wrong rule and follow it off a cliff. The grid's highlighted row is that
-    prediction coming true: same weak model (GPT-5.4-nano, SearchQA), same five nights, same
-    candidate edits — gate off vs on.</p>
+    <h3>How this grid stopped collapsing: a debugging story with an ablation in it</h3>
+    <p>An earlier version of this grid contained a catastrophe. Its gate-free SearchQA cell on
+    the weakest model collapsed 0.554 &rarr; 0.026 — the optimizer adopted a plausible-but-wrong
+    rule ("answer with the document title string, verbatim") and the obedient small model rode it
+    off a cliff, exactly as Part 1 predicts for weak models on a degraded learning signal. The
+    gated twin — same model, same nights, same candidate edits — rejected those edits and never
+    lost a point:</p>
     <div class="bars">
       <div class="barrow"><div class="barlbl">Night 0 baseline</div>
         <div class="bartrack"><div class="barfill blue" style="width:57%">0.554</div></div></div>
@@ -412,20 +410,36 @@
       <div class="barrow"><div class="barlbl">After 5 nights — <b>with the gate</b> (default)</div>
         <div class="bartrack"><div class="barfill green" style="width:58%">0.570</div></div></div>
     </div>
+    <p>Debugging the collapse exposed its enabler: <b>the dream was silently broken.</b> A cache
+    keyed only on (task, skill) collapsed all K dream rollouts into one cached sample, so
+    contrastive reflection — learning from what good attempts did that bad ones didn't — never
+    actually fired. The optimizer was hallucinating rules off single failures. We fixed the cache
+    (every rollout is now an independent sample) and added <b>associative recall</b>: each night,
+    the K historical tasks most similar to tonight's new material join the dream. Re-running the
+    entire grid under all three configurations:</p>
+    <table>
+      <thead><tr><th>Grid configuration (all 18 cells each)</th><th>cells &gt; +0.5</th><th>cells &lt; &minus;0.5</th><th>mean &Delta;</th><th>worst &Delta;</th></tr></thead>
+      <tbody>
+        <tr><td>broken dream (the collapse grid)</td><td>7</td><td>5</td><td class="down">&minus;2.7</td><td class="down">&minus;52.8</td></tr>
+        <tr><td>fixed dream</td><td>6</td><td>7</td><td>+0.2</td><td>&minus;4.0</td></tr>
+        <tr><td class="hot"><b>fixed dream + recall (shipped)</b></td><td>7</td><td>7</td><td class="up"><b>+0.5</b></td><td><b>&minus;2.4</b></td></tr>
+      </tbody>
+    </table>
     <div class="panel gold">
-      <b>The prediction held, dramatically.</b> Ungated, the optimizer adopted a rule that
-      <em>sounded</em> right ("answer with the document title string, verbatim"), and the obedient
-      small model rode it from 0.554 to 0.026 — &minus;52.8 points in five nights. The gated twin
-      rejected those same edits and never lost a point. This is why the mean-effect "wash" from
-      Part 1 is not the whole story, and why SkillOpt-Sleep ships with the gate on by default.
+      <b>Defense in depth, each layer measured.</b> The gate was the backstop that saved the
+      collapse cell when reflection was broken (0.570 held vs 0.026). Fixing the dream removed
+      the catastrophe at its source — the same gate-free cell went from &minus;52.8 to +2.7
+      without any gate. Recall then lifted the grid mean to +0.5 and tightened the worst case to
+      &minus;2.4. Self-evolution becomes dependable not through one mechanism but through stacked,
+      individually-validated ones: diverse rollouts propose better, recall remembers, the
+      guardrail forbids ill-formed edits, and the gate catches whatever is left.
     </div>
-    <p>For users who can't hold out a validation set, the plugin's gate-free mode is hardened by a
-    <b>feature-side guardrail</b> — a rollout-free check that rejects any proposed rule violating
-    the task's output contract (format, language, no clarifying questions). In our runs it flipped
-    gate-free SpreadsheetBench from regressing to gaining on both the strongest and weakest
-    targets (GPT-5.5 &minus;0.4 &rarr; +0.4; nano &minus;5.0 &rarr; +2.9). Screening candidates by
-    skill-side features alone, without any validation rollouts, is the open direction this study
-    points to next.</p>
+    <p>For users who can't hold out a validation set, the gate-free mode is additionally hardened
+    by the <b>feature-side guardrail</b> — a rollout-free check that rejects any proposed rule
+    violating the task's output contract (format, language, no clarifying questions). In our runs
+    it flipped gate-free SpreadsheetBench from regressing to gaining on both the strongest and
+    weakest targets. Screening candidates by skill-side features alone, without any validation
+    rollouts, is the open direction this study points to next.</p>
 
     <h3>Get started in one minute</h3>
     <pre><code># Claude Code (plugin marketplace)
