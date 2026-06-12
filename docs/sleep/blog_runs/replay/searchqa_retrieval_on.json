@@ -1,0 +1,94 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.5",
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "gate": "on",
+      "replay_mode": "retrieval",
+      "retrieve_k": 10,
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 60,
+      "n_test": 1400,
+      "test_baseline": 0.7971,
+      "test_final": 0.8414,
+      "delta": 0.0443,
+      "progression": [
+        0.7971,
+        0.8357,
+        0.8414,
+        0.8414,
+        0.8414,
+        0.8414
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.7971,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.85,
+          "test_hard": 0.8357,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 1
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.9167,
+          "test_hard": 0.8414,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 3
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.9167,
+          "test_hard": 0.8414,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.9167,
+          "test_hard": 0.8414,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 5,
+          "n_train": 50,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.9167,
+          "test_hard": 0.8414,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        }
+      ],
+      "tokens": 14748687,
+      "final_skill_tail": "ailing \"?\".\n- Inside <answer>...</answer>, give the shortest unambiguous answer span that directly answers the question; trim extra modifiers or enclosing names.\n- Match the requested answer type exactly: for a location, output only the state/country if that is what is asked; do not output a title or broader phrase such as \"Kings of Spain\".\n- Do not include category words, titles, or relationship phrases unless they are part of the exact entity name required.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

@@ -63,3 +63,9 @@ docs/sleep/blog_runs/nightly/**/*.err
 docs/sleep/blog_runs/nightly/*.err
 docs/sleep/blog_runs/nightly/**/*.log
 docs/sleep/blog_runs/nightly/*.log
+docs/sleep/blog_runs/replay/*.err
+docs/sleep/blog_runs/replay/*.log
+docs/sleep/blog_runs/nightly_v2/**/*.err
+docs/sleep/blog_runs/nightly_v2/**/*.log
+docs/sleep/blog_runs/nightly_v2/*.err
+docs/sleep/blog_runs/nightly_v2/*.log
