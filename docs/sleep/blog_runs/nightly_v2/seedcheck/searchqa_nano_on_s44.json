@@ -1,0 +1,94 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.4-nano",
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "gate": "on",
+      "replay_mode": "retrieval",
+      "retrieve_k": 10,
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 60,
+      "n_test": 1400,
+      "test_baseline": 0.5671,
+      "test_final": 0.6136,
+      "delta": 0.0465,
+      "progression": [
+        0.5671,
+        0.5914,
+        0.5914,
+        0.5914,
+        0.5914,
+        0.6136
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.5671,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.6,
+          "test_hard": 0.5914,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.6,
+          "test_hard": 0.5914,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.6,
+          "test_hard": 0.5914,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.6,
+          "test_hard": 0.5914,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 5,
+          "n_train": 50,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.6333,
+          "test_hard": 0.6136,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 4
+        }
+      ],
+      "tokens": 14765280,
+      "final_skill_tail": "states...\"), extract the specific proper noun the question targets (e.g., output \"Pennsylvania\" instead of the item \"Liberty Bell\").\n- If the question asks for a category/type, output the primary category term present in the source (e.g., for area of a quadrilateral use \"Trapezoid\" not \"Trapezium\").\n- For biographical/creation questions, output the person/author name stated in the text (e.g., output \"Henrik Ibsen\" not the work title \"An Enemy of the People\").\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.4-nano",
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "gate": "on",
+      "replay_mode": "retrieval",
+      "retrieve_k": 10,
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 60,
+      "n_test": 1400,
+      "test_baseline": 0.5529,
+      "test_final": 0.5886,
+      "delta": 0.0357,
+      "progression": [
+        0.5529,
+        0.6207,
+        0.6207,
+        0.5886,
+        0.5886,
+        0.5886
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.5529,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.65,
+          "test_hard": 0.6207,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.65,
+          "test_hard": 0.6207,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.6667,
+          "test_hard": 0.5886,
+          "action": "accept_new_best",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.6667,
+          "test_hard": 0.5886,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        },
+        {
+          "night": 5,
+          "n_train": 50,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.6667,
+          "test_hard": 0.5886,
+          "action": "reject",
+          "accepted": false,
+          "n_edits": 0
+        }
+      ],
+      "tokens": 15406563,
+      "final_skill_tail": "se fragments; output only the minimal matching span (e.g., no \"adverb\", no \"Area of a ...\", no \"think fast\").\n- When the context names a person, output the exact primary name used in the context (e.g., \"Cassius Clay\"; do not add suffixes like \"Jr.\").\n- Avoid numeric or irrelevant quantities unless the question explicitly asks for them; otherwise, select the specific named item/label explicitly referenced (e.g., choose \"Robin Yount\" not \"123 sacrifice flies\").\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "experiment": "skillopt-sleep/nightly",
+  "model": "gpt-5.4-mini",
+  "results": [
+    {
+      "benchmark": "searchqa",
+      "gate": "off",
+      "replay_mode": "retrieval",
+      "retrieve_k": 10,
+      "nights": 5,
+      "per_night": 10,
+      "rollouts": 5,
+      "n_val": 60,
+      "n_test": 1400,
+      "test_baseline": 0.775,
+      "test_final": 0.7714,
+      "delta": -0.0036,
+      "progression": [
+        0.775,
+        0.7593,
+        0.7636,
+        0.7757,
+        0.77,
+        0.7714
+      ],
+      "nights_log": [
+        {
+          "night": 0,
+          "n_train": 0,
+          "test_hard": 0.775,
+          "action": "baseline",
+          "accepted": false
+        },
+        {
+          "night": 1,
+          "n_train": 10,
+          "n_replayed": 0,
+          "n_dream": 20,
+          "val_hard": 0.0,
+          "test_hard": 0.7593,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 2,
+          "n_train": 20,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.0,
+          "test_hard": 0.7636,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 3,
+          "n_train": 30,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.0,
+          "test_hard": 0.7757,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        },
+        {
+          "night": 4,
+          "n_train": 40,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.0,
+          "test_hard": 0.77,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 3
+        },
+        {
+          "night": 5,
+          "n_train": 50,
+          "n_replayed": 10,
+          "n_dream": 40,
+          "val_hard": 0.0,
+          "test_hard": 0.7714,
+          "action": "greedy_applied",
+          "accepted": true,
+          "n_edits": 4
+        }
+      ],
+      "tokens": 32225680,
+      "final_skill_tail": "organization, do not shorten it to a nickname or subset (e.g., use \"Winnie-the-Pooh\" instead of \"Pooh\").\n- When the passage says someone \"became a member of\" or similar, answer with the named group/organization immediately tied to that relation, not the person's later honors or other biographical facts.\n- Keep the final response inside \"<answer>...</answer>\" and give only the minimal answer string supported by the text; do not add explanations or extra words.\n<!-- SKILLOPT-SLEEP:LEARNED END -->\n"
+    }
+  ]
+}
