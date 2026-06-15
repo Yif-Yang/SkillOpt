@@ -36,8 +36,7 @@ import sys
 from typing import Dict, List
 
 from skillopt_sleep.backend import build_backend
-from skillopt_sleep.consolidate import consolidate
-from skillopt_sleep.experiments.daily_cases import dream_augment
+from skillopt_sleep.dream import dream_consolidate
 from skillopt_sleep.experiments.real_bench import _BENCH, DATA_ROOT, _load
 from skillopt_sleep.replay import aggregate_scores, replay_batch
 from skillopt_sleep.types import TaskRecord
@@ -147,29 +146,28 @@ def run_nightly(backend, bench, *, nights, per_night, rollouts, edit_budget,
             break
         new_real = _make_tasks(bench, new_items, "train", data_root, seed)
 
-        # replay: which historical experience joins tonight's dream
-        if replay_mode == "cumulative":
-            replayed = list(history_real)
-        elif replay_mode == "retrieval":
-            replayed = _retrieve_similar(new_real, history_real, retrieve_k)
-        else:
-            replayed = []
-
-        # dream: many rollout groups happen inside consolidate via rollouts_k;
-        # we ALSO add light synthetic variants so the train pool is richer.
-        dream_seed = new_real + replayed
-        train_tasks = list(dream_seed)
-        if dream_factor > 0:
-            train_tasks = train_tasks + dream_augment(dream_seed, factor=dream_factor)
-
-        # consolidate: reflect over this night's (real+dream) tasks, refine the
-        # carried-over skill; gate on the val slice (or greedily if gate off).
-        night_tasks = train_tasks + val_tasks  # consolidate splits by .split
-        res = consolidate(
-            backend, night_tasks, skill, "",
+        # Route through the SHIPPED engine (skillopt_sleep.dream.dream_consolidate)
+        # so these numbers exercise the exact code path the plugin runs.
+        #   retrieval -> the engine's own associative recall (recall_k)
+        #   cumulative -> pre-include all history as train (full-replay reference)
+        #   none -> no recall
+        pool = list(new_real) + list(val_tasks)
+        history_for_recall = None
+        recall_k_arg = 0
+        if replay_mode == "retrieval":
+            history_for_recall, recall_k_arg = history_real, retrieve_k
+        elif replay_mode == "cumulative":
+            pool = pool + [t for t in history_real]  # full replay, pre-included
+        res = dream_consolidate(
+            backend, pool, skill, "",
+            history_tasks=history_for_recall, recall_k=recall_k_arg,
+            dream_rollouts=rollouts, dream_factor=dream_factor,
             edit_budget=edit_budget, gate_metric="hard", gate_mode=gate_mode,
-            rollouts_k=rollouts, evolve_skill=True, evolve_memory=False, night=night,
+            evolve_skill=True, evolve_memory=False, night=night,
         )
+        replayed = (_retrieve_similar(new_real, history_real, retrieve_k)
+                    if replay_mode == "retrieval"
+                    else (list(history_real) if replay_mode == "cumulative" else []))
         if res.accepted:
             skill = res.new_skill
         history_real.extend(new_real)
@@ -178,7 +176,7 @@ def run_nightly(backend, bench, *, nights, per_night, rollouts, edit_budget,
         nights_log.append({
             "night": night, "n_train": used,
             "n_replayed": len(replayed),
-            "n_dream": sum(1 for t in train_tasks if t.origin == "dream"),
+            "n_dream": dream_factor * (len(new_real) + len(replayed)),
             "val_hard": round(res.holdout_candidate, 4),
             "test_hard": round(test_after, 4),
             "action": res.gate_action, "accepted": res.accepted,

@@ -44,6 +44,10 @@ DEFAULTS: Dict[str, Any] = {
     "gate_metric": "mixed",       # hard | soft | mixed (mixed best for tiny holdouts)
     "gate_mixed_weight": 0.5,
     "replay_mode": "mock",        # "mock" (sandboxed prompt) | "fresh" (worktree)
+    # ── dream + recall (opt-in; defaults reproduce the prior single-shot loop) ─
+    "dream_rollouts": 1,          # >1 => multi-rollout contrastive reflection per task
+    "dream_factor": 0,            # >0 => add N synthetic variants of each task to the dream
+    "recall_k": 0,                # >0 => recall the K most-similar past tasks into the dream
     "evolve_memory": True,        # consolidate CLAUDE.md
     "evolve_skill": True,         # consolidate the managed SKILL.md
     "llm_mine": True,             # use the backend to mine checkable tasks (real backends)
