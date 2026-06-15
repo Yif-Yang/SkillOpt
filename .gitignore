@@ -67,3 +67,5 @@ docs/sleep/blog_runs/nightly_v2/**/*.err
 docs/sleep/blog_runs/nightly_v2/**/*.log
 docs/sleep/blog_runs/nightly_v2/*.err
 docs/sleep/blog_runs/nightly_v2/*.log
+docs/sleep/blog_runs/v2_port/*.err
+docs/sleep/blog_runs/v2_port/*.log
