@@ -194,8 +194,12 @@ class MockBackend(Backend):
 
     def judge(self, task: TaskRecord, response: str) -> Tuple[float, float, str]:
         if task.reference_kind == "answer" and task.judge:
-            from skillopt_sleep.experiments.real_eval import score_answer_judge
-            return score_answer_judge(task.judge, response)
+            try:
+                from skillopt_sleep.experiments.real_eval import score_answer_judge
+            except ImportError:
+                score_answer_judge = None  # research evaluators not bundled
+            if score_answer_judge is not None:
+                return score_answer_judge(task.judge, response)
         if task.reference_kind == "rule" and task.judge:
             from skillopt_sleep.judges import score_rule_judge
             return score_rule_judge(task.judge, response)
@@ -368,8 +372,12 @@ class CliBackend(Backend):
     def judge(self, task: TaskRecord, response: str) -> Tuple[float, float, str]:
         # real-benchmark correctness judge (searchqa/livemath/spreadsheet) — local
         if task.reference_kind == "answer" and task.judge:
-            from skillopt_sleep.experiments.real_eval import score_answer_judge
-            return score_answer_judge(task.judge, response)
+            try:
+                from skillopt_sleep.experiments.real_eval import score_answer_judge
+            except ImportError:
+                score_answer_judge = None  # research evaluators not bundled
+            if score_answer_judge is not None:
+                return score_answer_judge(task.judge, response)
         # gbrain-style rule judge: scored locally, no API spend
         if task.reference_kind == "rule" and task.judge:
             from skillopt_sleep.judges import score_rule_judge

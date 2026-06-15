@@ -20,6 +20,12 @@ sleep** idea (short-term experience → long-term competence).
 
 ---
 
+| Platform | Folder | Mechanism | Status |
+|---|---|---|---|
+| **Claude Code** | [`claude-code/`](claude-code) | `.claude-plugin` + `/skillopt-sleep` command + skill + hooks | full, installable |
+| **Codex** | [`codex/`](codex) | user-level `skillopt-sleep` skill + shared runner | full |
+| **Copilot** | [`copilot/`](copilot) | MCP server (`sleep_*` tools) + `copilot-instructions` | full (MCP) |
+
 ## Install (pick your agent)
 
 | Platform | Install | Then |

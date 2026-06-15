@@ -22,22 +22,18 @@ data/*
 outputs/
 logs/
 external/
-
 /BabyVision/
 /MMRB/
 /SpreadsheetBench/
 /dl4ir-searchQA/
-
 configs/local/
 configs/**/*.local.yaml
 *.local.md
 *.secret.md
 *.bak
-
 .env
 .secrets/
 .codex_azure*/
-
 # Internal docs (not for open-source release)
 docs/ablation_plan.md
 docs/ablation_paper_tables.md
@@ -54,10 +50,12 @@ docs/render_ablation_paper_tables.py
 docs/让*
 .gradio/
 .venv
-
+# Local experiment launchers — contain machine-specific endpoints/identities, never commit
+tests/run_*.sh
+tests/launch_*.py
+*.launch.log
 # matrix run stderr sidecars (openpyxl warnings only)
 docs/sleep/blog_runs/real/*.err
-
 # nightly run sidecars
 docs/sleep/blog_runs/nightly/**/*.err
 docs/sleep/blog_runs/nightly/*.err
