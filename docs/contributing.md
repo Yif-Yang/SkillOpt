@@ -75,9 +75,9 @@ mkdocs serve  # Preview at http://localhost:8000
 
 ## Code Review Guidelines
 
-We maintain a [code review & contribution guide](review_guidelines.md) distilled
-from maintainer review feedback. Reviewers and contributors should use it as a
-shared checklist before merging.
+See the [code review checklist](review_guidelines.md) for common considerations
+that may help reviewers and contributors. Apply the items relevant to the scope
+and risk of each change.
 
 ## License
 
